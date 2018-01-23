@@ -61,6 +61,10 @@ public class MigrateVMCmd extends BaseAsyncCmd {
             description = "Destination storage pool ID to migrate VM volumes to. Required for migrating the root disk volume")
     private Long storageId;
 
+    @Parameter(name = ApiConstants.CONVERGE,
+            type = CommandType.BOOLEAN)
+    private Boolean converge;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -85,6 +89,10 @@ public class MigrateVMCmd extends BaseAsyncCmd {
 
     public Long getHostId() {
         return hostId;
+    }
+
+    public Boolean getConverge() {
+        return converge;
     }
 
     @Override

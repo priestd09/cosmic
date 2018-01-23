@@ -35,7 +35,7 @@ public class MigrateKvmAsync implements Callable<Domain> {
         if (dconn.getLibVirVersion() < 1003000) {
             return dm.migrate(dconn, 1 << 0, dxml, vmName, "tcp:" + destIp, libvirtComputingResource.getMigrateSpeed());
         } else {
-            return dm.migrate(dconn, 1 << 0 | 1 << 11, dxml, vmName, "tcp:" + destIp,
+            return dm.migrate(dconn, 1 << 0 | 1 << 11 | 1 << 13, dxml, vmName, "tcp:" + destIp,
                     libvirtComputingResource.getMigrateSpeed());
         }
     }

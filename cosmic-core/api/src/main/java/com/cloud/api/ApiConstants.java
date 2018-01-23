@@ -578,6 +578,8 @@ public class ApiConstants {
     public static final String VIRTUAL_MACHINE_TYPE = "virtualmachinetype";
     public static final String DOMAIN_UUID = "domainuuid";
 
+    public static final String CONVERGE = "converge";
+
     public enum HostDetails {
         all, capacity, events, stats, min
     }
