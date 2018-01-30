@@ -1675,7 +1675,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final TermPolicy term = new TermPolicy();
         term.setCrashPolicy("destroy");
         term.setPowerOffPolicy("destroy");
-        term.setRebootPolicy("restart");
+        term.setRebootPolicy("destroy");
         vm.addComp(term);
 
         final ClockDef clock = new ClockDef();
