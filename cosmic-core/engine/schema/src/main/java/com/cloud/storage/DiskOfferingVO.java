@@ -51,6 +51,14 @@ public class DiskOfferingVO implements DiskOffering {
     Long iopsReadRate;
     @Column(name = "iops_write_rate")
     Long iopsWriteRate;
+    @Column(name = "min_iops_per_gb")
+    Long minIopsPerGb;
+    @Column(name = "max_iops_per_gb")
+    Long maxIopsPerGb;
+    @Column(name = "highest_min_iops")
+    Long highestMinIops;
+    @Column(name = "highest_max_iops")
+    Long highestMaxIops;
     @Column(name = "provisioning_type")
     Storage.ProvisioningType provisioningType;
     @Column(name = "display_offering")
@@ -369,6 +377,46 @@ public class DiskOfferingVO implements DiskOffering {
     @Override
     public Long getIopsWriteRate() {
         return iopsWriteRate;
+    }
+
+    @Override
+    public Long getMinIopsPerGb() {
+        return this.minIopsPerGb;
+    }
+
+    @Override
+    public void setMinIopsPerGb(Long minIopsPerGb) {
+        this.minIopsPerGb = minIopsPerGb;
+    }
+
+    @Override
+    public Long getMaxIopsPerGb() {
+        return maxIopsPerGb;
+    }
+
+    @Override
+    public void setMaxIopsPerGb(Long maxIopsPerGb) {
+        this.maxIopsPerGb = maxIopsPerGb;
+    }
+
+    @Override
+    public Long getHighestMinIops() {
+        return this.highestMinIops;
+    }
+
+    @Override
+    public void setHighestMinIops(Long highestMinIops) {
+        this.highestMinIops = highestMinIops;
+    }
+
+    @Override
+    public Long getHighestMaxIops() {
+        return this.highestMaxIops;
+    }
+
+    @Override
+    public void setHighestMaxIops(Long highestMaxIops) {
+        this.highestMaxIops = highestMaxIops;
     }
 
     @Override

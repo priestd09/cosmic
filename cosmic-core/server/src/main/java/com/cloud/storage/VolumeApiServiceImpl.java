@@ -352,6 +352,23 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 }
             }
 
+            //check if iops/gb is defined, if so, use it
+            if (diskOffering.getMinIopsPerGb() != null) {
+                minIops = sizeInGB * diskOffering.getMinIopsPerGb();
+            }
+
+            if (diskOffering.getMaxIopsPerGb() != null) {
+                maxIops = sizeInGB * diskOffering.getMaxIopsPerGb();
+            }
+
+            //check limits for IOPS and set them if required
+            if (diskOffering.getHighestMinIops() != null && minIops != null && minIops > diskOffering.getHighestMinIops()) {
+                minIops = diskOffering.getHighestMinIops();
+            }
+            if (diskOffering.getHighestMaxIops() != null && maxIops != null && maxIops > diskOffering.getHighestMaxIops()) {
+                maxIops = diskOffering.getHighestMaxIops();
+            }
+
             provisioningType = diskOffering.getProvisioningType();
 
             if (!validateVolumeSizeRange(size)) {// convert size from mb to gb
@@ -377,11 +394,28 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 // if zoneId is not provided, we default to create volume in the same zone as the snapshot zone.
                 zoneId = snapshotCheck.getDataCenterId();
             }
-            size = snapshotCheck.getSize(); // ; disk offering is used for tags
-            // purposes
+            size = snapshotCheck.getSize(); // ; disk offering is used for tags purposes
+            Long sizeInGB = size/(1024 * 1024 * 1024);
 
             minIops = snapshotCheck.getMinIops();
             maxIops = snapshotCheck.getMaxIops();
+
+            // IOPS/GB overrides the manually set IOPS
+            if (diskOffering.getMinIopsPerGb() != null) {
+                minIops = sizeInGB * diskOffering.getMinIopsPerGb();
+            }
+
+            if (diskOffering.getMaxIopsPerGb() != null) {
+                maxIops = sizeInGB * diskOffering.getMaxIopsPerGb();
+            }
+
+            if (diskOffering.getHighestMinIops() != null && minIops != null && minIops > diskOffering.getHighestMinIops()) {
+                minIops = diskOffering.getHighestMinIops();
+            }
+
+            if (diskOffering.getHighestMaxIops() != null && maxIops != null && maxIops > diskOffering.getHighestMaxIops()) {
+                maxIops = diskOffering.getHighestMaxIops();
+            }
 
             provisioningType = diskOffering.getProvisioningType();
             // check snapshot permissions
@@ -1124,6 +1158,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     @ActionEvent(eventType = EventTypes.EVENT_VOLUME_RESIZE, eventDescription = "resizing volume", async = true)
     public VolumeVO resizeVolume(final ResizeVolumeCmd cmd) throws ResourceAllocationException {
         Long newSize;
+        Long newSizeInGb;
         Long newMinIops;
         Long newMaxIops;
         final boolean shrinkOk = cmd.getShrinkOk();
@@ -1181,6 +1216,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 // no parameter provided; just use the original size of the volume
                 newSize = volume.getSize();
             }
+            newSizeInGb = newSize >> 30;
 
             newMinIops = cmd.getMinIops();
 
@@ -1244,6 +1280,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 newSize = newDiskOffering.getDiskSize();
             }
 
+            newSizeInGb = newSize >> 30;
             if (!volume.getSize().equals(newSize) && !volume.getVolumeType().equals(Volume.Type.DATADISK)) {
                 throw new InvalidParameterValueException("Only data volumes can be resized via a new disk offering.");
             }
@@ -1256,6 +1293,14 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             } else {
                 newMinIops = newDiskOffering.getMinIops();
                 newMaxIops = newDiskOffering.getMaxIops();
+            }
+
+            if (newDiskOffering.getMinIopsPerGb() != null) {
+                newMinIops = newSizeInGb * newDiskOffering.getMinIopsPerGb();
+            }
+
+            if (newDiskOffering.getMaxIopsPerGb() != null) {
+                newMaxIops = newSizeInGb * newDiskOffering.getMaxIopsPerGb();
             }
         }
 
@@ -1283,6 +1328,16 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 _resourceLimitMgr.checkResourceLimit(_accountMgr.getAccount(volume.getAccountId()), ResourceType.primary_storage, volume.isDisplayVolume(),
                         new Long(newSize - currentSize).longValue());
             }
+        }
+
+        Long highestMinIops = diskOffering.getHighestMinIops();
+        if (newMinIops != null && highestMinIops != null && newMinIops > highestMinIops) {
+            newMinIops = highestMinIops;
+        }
+
+        Long highestMaxIops = diskOffering.getHighestMaxIops();
+        if (newMaxIops != null && highestMaxIops != null && newMaxIops > highestMaxIops) {
+            newMaxIops = highestMaxIops;
         }
 
         // Note: The storage plug-in in question should perform validation on the IOPS to check if a sufficient number of IOPS is available to perform

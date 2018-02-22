@@ -53,6 +53,10 @@ public class ApiConstants {
     public static final String CUSTOM_JOB_ID = "customjobid";
     public static final String MIN_IOPS = "miniops";
     public static final String MAX_IOPS = "maxiops";
+    public static final String MIN_IOPS_PER_GB = "miniopspergb";
+    public static final String MAX_IOPS_PER_GB = "maxiopspergb";
+    public static final String HIGHEST_MIN_IOPS = "highestminiops";
+    public static final String HIGHEST_MAX_IOPS = "highestmaxiops";
     public static final String HYPERVISOR_SNAPSHOT_RESERVE = "hypervisorsnapshotreserve";
     public static final String DESCRIPTION = "description";
     public static final String DESTINATION_ZONE_ID = "destzoneid";

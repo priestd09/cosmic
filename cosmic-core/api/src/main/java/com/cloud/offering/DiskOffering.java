@@ -80,6 +80,22 @@ public interface DiskOffering extends InfrastructureEntity, Identity, InternalId
 
     Type getType();
 
+    Long getMinIopsPerGb();
+
+    void setMinIopsPerGb(Long minIopsPerGB);
+
+    Long getMaxIopsPerGb();
+
+    void setMaxIopsPerGb(Long maxIopsPerGB);
+
+    Long getHighestMinIops();
+
+    void setHighestMinIops(Long highestMinIops);
+
+    Long getHighestMaxIops();
+
+    void setHighestMaxIops(Long highestMaxIops);
+
     enum State {
         Inactive, Active,
     }
