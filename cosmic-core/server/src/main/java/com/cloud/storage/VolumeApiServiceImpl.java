@@ -1216,7 +1216,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 // no parameter provided; just use the original size of the volume
                 newSize = volume.getSize();
             }
-            newSizeInGb = newSize >> 30; // todo check this
+            newSizeInGb = newSize >> 30;
             newMinIops = cmd.getMinIops();
 
             if (newMinIops != null) {
