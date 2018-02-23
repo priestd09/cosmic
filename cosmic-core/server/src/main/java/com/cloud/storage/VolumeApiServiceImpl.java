@@ -1216,8 +1216,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 // no parameter provided; just use the original size of the volume
                 newSize = volume.getSize();
             }
-            newSizeInGb = newSize >> 30;
-
+            newSizeInGb = newSize >> 30; // todo check this
             newMinIops = cmd.getMinIops();
 
             if (newMinIops != null) {
@@ -1229,6 +1228,10 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 newMinIops = volume.getMinIops();
             }
 
+            if (diskOffering.getMaxIopsPerGb() != null) {
+                newMinIops = newSizeInGb * diskOffering.getMinIopsPerGb();
+            }
+
             newMaxIops = cmd.getMaxIops();
 
             if (newMaxIops != null) {
@@ -1238,6 +1241,10 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             } else {
                 // no parameter provided; just use the original max IOPS of the volume
                 newMaxIops = volume.getMaxIops();
+            }
+
+            if (diskOffering.getMaxIopsPerGb() != null) {
+                newMaxIops = newSizeInGb * diskOffering.getMaxIopsPerGb();
             }
 
             validateIops(newMinIops, newMaxIops);
@@ -1274,7 +1281,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                     throw new InvalidParameterValueException("The new disk offering requires that a size be specified.");
                 }
 
-                // convert from bytes to GiB
+                // convert from GB to bytes
                 newSize = newSize << 30;
             } else {
                 newSize = newDiskOffering.getDiskSize();
