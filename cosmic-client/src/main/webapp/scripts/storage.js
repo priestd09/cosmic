@@ -1464,7 +1464,7 @@
 
                                     var newDiskOffering = args.data.newdiskoffering;
                                     var newSize;
-                                    if (selectedDiskOfferingObj == null || selectedDiskOfferingObj.iscustomized == true) {
+                                    if (selectedDiskOfferingObj == null) {
                                         newSize = args.data.newsize;
                                     }
                                     if (newDiskOffering != null && newDiskOffering.length > 0) {

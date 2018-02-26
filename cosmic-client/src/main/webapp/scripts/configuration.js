@@ -1644,6 +1644,7 @@
                                             args.$select.change(function () {
                                                 var $form = $(this).closest('form');
                                                 var $isCustomizedIops = $form.find('.form-item[rel=isCustomizedIops]');
+                                                var $isCustomized = $form.find('.form-item[rel=isCustomized]');
                                                 var $minIops = $form.find('.form-item[rel=minIops]');
                                                 var $maxIops = $form.find('.form-item[rel=maxIops]');
                                                 var $hypervisorSnapshotReserve = $form.find('.form-item[rel=hypervisorSnapshotReserve]');
@@ -1651,6 +1652,10 @@
                                                 var $diskBytesWriteRate = $form.find('.form-item[rel=diskBytesWriteRate]');
                                                 var $diskIopsReadRate = $form.find('.form-item[rel=diskIopsReadRate]');
                                                 var $diskIopsWriteRate = $form.find('.form-item[rel=diskIopsWriteRate]');
+                                                var $highestMinIops = $form.find('.form-item[rel=highestMinIops]');
+                                                var $highestMaxIops = $form.find('.form-item[rel=highestMaxIops]');
+                                                var $minIopsPerGb = $form.find('.form-item[rel=minIopsPerGb]');
+                                                var $maxIopsPerGb = $form.find('.form-item[rel=maxIopsPerGb]');
 
                                                 var qosId = $(this).val();
 
@@ -1661,6 +1666,11 @@
                                                     $diskIopsWriteRate.hide();
 
                                                     $isCustomizedIops.css('display', 'inline-block');
+
+                                                    $highestMinIops.css('display', 'inline-block');
+                                                    $highestMaxIops.css('display', 'inline-block');
+                                                    $minIopsPerGb.css('display', 'inline-block');
+                                                    $maxIopsPerGb.css('display', 'inline-block');
 
                                                     if ($isCustomizedIops.find('input[type=checkbox]').is(':checked')) {
                                                         $minIops.hide();
@@ -1675,6 +1685,11 @@
                                                     $isCustomizedIops.hide();
                                                     $minIops.hide();
                                                     $maxIops.hide();
+                                                    $highestMaxIops.hide();
+                                                    $highestMinIops.hide();
+                                                    $minIopsPerGb.hide();
+                                                    $maxIopsPerGb.hide();
+
                                                     $hypervisorSnapshotReserve.hide();
 
                                                     $diskBytesReadRate.css('display', 'inline-block');
@@ -1689,6 +1704,10 @@
                                                     $isCustomizedIops.hide();
                                                     $minIops.hide();
                                                     $maxIops.hide();
+                                                    $highestMaxIops.hide();
+                                                    $highestMinIops.hide();
+                                                    $minIopsPerGb.hide();
+                                                    $maxIopsPerGb.hide();
                                                     $hypervisorSnapshotReserve.hide();
                                                 }
                                             });
@@ -1714,6 +1733,38 @@
                                         label: 'label.disk.iops.max',
                                         docID: 'helpDiskOfferingDiskIopsMax',
                                         dependsOn: 'isCustomizedIops',
+                                        validation: {
+                                            required: false,
+                                            number: true
+                                        }
+                                    },
+                                    highestMinIops: {
+                                        label: 'label.disk.iops.highest.min',
+                                        docID: 'helpDiskOfferingHighestMinIops',
+                                        validation: {
+                                            required: false,
+                                            number: true
+                                        }
+                                    },
+                                    highestMaxIops: {
+                                        label: 'label.disk.iops.highest.max',
+                                        docID: 'helpDiskOfferingHighestMaxIops',
+                                        validation: {
+                                            required: false,
+                                            number: true
+                                        }
+                                    },
+                                    minIopsPerGb: {
+                                        label: 'label.disk.iops.pergb.min',
+                                        docID: 'helpDiskOfferingMinIopsPerGb',
+                                        validation: {
+                                            required: false,
+                                            number: true
+                                        }
+                                    },
+                                    maxIopsPerGb: {
+                                        label: 'label.disk.iops.pergb.max',
+                                        docID: 'helpDiskOfferingMaxIopsPerGb',
                                         validation: {
                                             required: false,
                                             number: true
@@ -1891,6 +1942,29 @@
                                                 maxiops: args.data.maxIops
                                             });
                                         }
+                                    }
+                                    if (args.data.highestMinIops != null && args.data.highestMinIops > 0) {
+                                        $.extend(data, {
+                                            highestminiops: args.data.highestMinIops
+                                        });
+                                    }
+
+                                    if (args.data.highestMaxIops != null && args.data.highestMaxIops > 0) {
+                                        $.extend(data, {
+                                            highestmaxiops: args.data.highestMaxIops
+                                        });
+                                    }
+
+                                    if (args.data.minIopsPerGb != null && args.data.minIopsPerGb > 0) {
+                                        $.extend(data, {
+                                            miniopspergb: args.data.minIopsPerGb
+                                        });
+                                    }
+
+                                    if (args.data.maxIopsPerGb != null && args.data.maxIopsPerGb > 0) {
+                                        $.extend(data, {
+                                            maxiopspergb: args.data.maxIopsPerGb
+                                        });
                                     }
 
                                     if (args.data.hypervisorSnapshotReserve != null && args.data.hypervisorSnapshotReserve.length > 0) {
@@ -2097,6 +2171,45 @@
                                     },
                                     diskIopsWriteRate: {
                                         label: 'label.disk.iops.write.rate'
+                                    },
+                                    miniopspergb: {
+                                    label: 'label.disk.iops.pergb.min',
+                                        converter: function (args) {
+                                            if (args > 0)
+                                                return args;
+                                            else
+                                                return "N/A";
+                                        }
+
+                                    },
+                                    maxiopspergb: {
+                                        label: 'label.disk.iops.pergb.max',
+                                        converter: function (args) {
+                                            if (args > 0)
+                                                return args;
+                                            else
+                                                return "N/A";
+                                        }
+
+                                    },
+                                    highestminiops: {
+                                        label: 'label.disk.iops.highest.min',
+                                        converter: function (args) {
+                                            if (args > 0)
+                                                return args;
+                                            else
+                                                return "N/A";
+                                        }
+
+                                    },
+                                    highestmaxiops: {
+                                        label: 'label.disk.iops.highest.max',
+                                        converter: function (args) {
+                                            if (args > 0)
+                                                return args;
+                                            else
+                                                return "N/A";
+                                        }
                                     },
                                     cacheMode: {
                                         label: 'label.cache.mode'
