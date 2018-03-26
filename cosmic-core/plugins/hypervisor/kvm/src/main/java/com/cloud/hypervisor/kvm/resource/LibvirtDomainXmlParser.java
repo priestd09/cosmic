@@ -105,6 +105,7 @@ public class LibvirtDomainXmlParser {
                     }
                 }
 
+                // todo maybe something here
                 final NodeList iotune = disk.getElementsByTagName("iotune");
                 if (iotune != null && iotune.getLength() != 0) {
                     final String bytesReadRateStr = getTagValue("read_bytes_sec", (Element) iotune.item(0));
@@ -126,6 +127,12 @@ public class LibvirtDomainXmlParser {
                     if (iopsWriteRateStr != null) {
                         final Long iopsWriteRate = Long.parseLong(iopsWriteRateStr);
                         def.setIopsWriteRate(iopsWriteRate);
+                    }
+
+                    final String totalIopsRateStr = getTagValue("total_iops_sec", (Element) iotune.item(0));
+                    if(totalIopsRateStr != null) {
+                        final Long totalIopsRate = Long.parseLong((totalIopsRateStr));
+                        def.setTotalIopsRate(totalIopsRate);
                     }
                 }
 

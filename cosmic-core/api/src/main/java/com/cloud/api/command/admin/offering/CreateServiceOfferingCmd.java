@@ -102,6 +102,9 @@ public class CreateServiceOfferingCmd extends BaseCmd {
     @Parameter(name = ApiConstants.IOPS_WRITE_RATE, type = CommandType.LONG, required = false, description = "io requests write rate of the disk offering")
     private Long iopsWriteRate;
 
+    @Parameter(name = ApiConstants.IOPS_TOTAL_RATE, type = CommandType.LONG, required = false, description = "io requests total rate of the disk offering")
+    private Long totalIopsRate;
+
     @Parameter(name = ApiConstants.CUSTOMIZED_IOPS, type = CommandType.BOOLEAN, required = false, description = "whether compute offering iops is custom or not", since = "4.4")
     private Boolean customizedIops;
 
@@ -218,6 +221,10 @@ public class CreateServiceOfferingCmd extends BaseCmd {
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
+    }
+
+    public Long getTotalIopsRate(){
+        return totalIopsRate;
     }
 
     public Boolean isCustomizedIops() {

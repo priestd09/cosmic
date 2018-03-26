@@ -51,6 +51,8 @@ public class DiskOfferingVO implements DiskOffering {
     Long iopsReadRate;
     @Column(name = "iops_write_rate")
     Long iopsWriteRate;
+    @Column(name = "total_iops_rate")
+    Long totalIopsRate;
     @Column(name = "min_iops_per_gb")
     Long minIopsPerGb;
     @Column(name = "max_iops_per_gb")
@@ -377,6 +379,16 @@ public class DiskOfferingVO implements DiskOffering {
     @Override
     public Long getIopsWriteRate() {
         return iopsWriteRate;
+    }
+
+    @Override
+    public Long getTotalIopsRate() {
+        return totalIopsRate;
+    }
+
+    @Override
+    public void setTotalIopsRate(Long totalIopsRate) {
+        this.totalIopsRate = totalIopsRate;
     }
 
     @Override

@@ -65,6 +65,9 @@ public class CreateDiskOfferingCmd extends BaseCmd {
     @Parameter(name = ApiConstants.IOPS_WRITE_RATE, type = CommandType.LONG, required = false, description = "io requests write rate of the disk offering")
     private Long iopsWriteRate;
 
+    @Parameter(name = ApiConstants.IOPS_TOTAL_RATE, type = CommandType.LONG, required = false, description = "io requests total rate of the disk offering")
+    private Long iopsTotalRate;
+
     @Parameter(name = ApiConstants.CUSTOMIZED_IOPS, type = CommandType.BOOLEAN, required = false, description = "whether disk offering iops is custom or not")
     private Boolean customizedIops;
 
@@ -162,6 +165,10 @@ public class CreateDiskOfferingCmd extends BaseCmd {
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
+    }
+
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
     }
 
     public String getStorageType() {

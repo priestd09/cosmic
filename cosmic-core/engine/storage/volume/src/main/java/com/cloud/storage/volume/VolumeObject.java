@@ -266,6 +266,15 @@ public class VolumeObject implements VolumeInfo {
     }
 
     @Override
+    public Long getTotalIopsRate() {
+        final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
+        if (diskOfferingVO != null) {
+            return diskOfferingVO.getTotalIopsRate();
+        }
+        return null;
+    }
+
+    @Override
     public DiskCacheMode getCacheMode() {
         final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
         if (diskOfferingVO != null) {

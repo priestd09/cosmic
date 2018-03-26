@@ -1749,6 +1749,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
             }
 
+            // todo: maybe something here
             if (data instanceof VolumeObjectTO) {
                 final VolumeObjectTO volumeObjectTo = (VolumeObjectTO) data;
                 disk.setSerial(volumeObjectTo.getDeviceId() + "-" + diskUuidToSerial(volumeObjectTo.getUuid()));
@@ -1763,6 +1764,9 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
                 if (volumeObjectTo.getIopsWriteRate() != null && volumeObjectTo.getIopsWriteRate() > 0) {
                     disk.setIopsWriteRate(volumeObjectTo.getIopsWriteRate());
+                }
+                if (volumeObjectTo.getTotalIopsRate() != null && volumeObjectTo.getTotalIopsRate() > 0) {
+                    disk.setTotalIopsRate(volumeObjectTo.getTotalIopsRate());
                 }
                 if (volumeObjectTo.getCacheMode() != null) {
                     disk.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(volumeObjectTo.getCacheMode().toString().toUpperCase()));

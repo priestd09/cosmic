@@ -62,6 +62,7 @@ public final class LibvirtCreateCommandWrapper extends CommandWrapper<CreateComm
             volume.setBytesWriteRate(dskch.getBytesWriteRate());
             volume.setIopsReadRate(dskch.getIopsReadRate());
             volume.setIopsWriteRate(dskch.getIopsWriteRate());
+            volume.setTotalIopsRate(dskch.getTotalIopsRate());
             volume.setCacheMode(dskch.getCacheMode());
             return new CreateAnswer(command, volume);
         } catch (final CloudRuntimeException e) {
