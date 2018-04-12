@@ -256,18 +256,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
     protected boolean cleanupIpResources(final long ipId, final long userId, final Account caller) {
         boolean success = true;
 
-        // Revoke all firewall rules for the ip
-        try {
-            s_logger.debug("Revoking all " + Purpose.Firewall + "rules as a part of public IP id=" + ipId + " release...");
-            if (!_firewallMgr.revokeFirewallRulesForIp(ipId, userId, caller)) {
-                s_logger.warn("Unable to revoke all the firewall rules for ip id=" + ipId + " as a part of ip release");
-                success = false;
-            }
-        } catch (final ResourceUnavailableException e) {
-            s_logger.warn("Unable to revoke all firewall rules for ip id=" + ipId + " as a part of ip release", e);
-            success = false;
-        }
-
         // Revoke all PF/Static nat rules for the ip
         try {
             s_logger.debug("Revoking all " + Purpose.PortForwarding + "/" + Purpose.StaticNat + " rules as a part of public IP id=" + ipId + " release...");
@@ -419,14 +407,12 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         final FirewallRuleVO.TrafficType trafficType = rules.get(0).getTrafficType();
         final List<PublicIp> publicIps = new ArrayList<>();
 
-        if (!(rules.get(0).getPurpose() == FirewallRule.Purpose.Firewall && trafficType == FirewallRule.TrafficType.Egress)) {
-            // get the list of public ip's owned by the network
-            final List<IPAddressVO> userIps = _ipAddressDao.listByAssociatedNetwork(network.getId(), null);
-            if (userIps != null && !userIps.isEmpty()) {
-                for (final IPAddressVO userIp : userIps) {
-                    final PublicIp publicIp = PublicIp.createFromAddrAndVlan(userIp, _vlanDao.findById(userIp.getVlanId()));
-                    publicIps.add(publicIp);
-                }
+        // get the list of public ip's owned by the network
+        final List<IPAddressVO> userIps = _ipAddressDao.listByAssociatedNetwork(network.getId(), null);
+        if (userIps != null && !userIps.isEmpty()) {
+            for (final IPAddressVO userIp : userIps) {
+                final PublicIp publicIp = PublicIp.createFromAddrAndVlan(userIp, _vlanDao.findById(userIp.getVlanId()));
+                publicIps.add(publicIp);
             }
         }
         // rules can not programmed unless IP is associated with network service provider, so run IP assoication for
@@ -667,10 +653,6 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                 return addr;
             }
         });
-
-        if (vlanUse == VlanType.VirtualNetwork) {
-            _firewallMgr.addSystemFirewallRules(addr, owner);
-        }
 
         return PublicIp.createFromAddrAndVlan(addr, _vlanDao.findById(addr.getVlanId()));
     }

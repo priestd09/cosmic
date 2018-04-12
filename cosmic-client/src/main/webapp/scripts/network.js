@@ -4381,7 +4381,6 @@
                                                     name: args.data.name,
                                                     privateport: args.data.privateport,
                                                     publicport: args.data.publicport,
-                                                    openfirewall: false,
                                                     networkid: networkid,
                                                     publicipid: args.context.ipAddresses[0].id
                                                 };
@@ -4890,19 +4889,15 @@
                                             }
                                         }),
                                         fields: {
-                                            //'private-ports': {
                                             privateport: {
                                                 edit: true,
                                                 label: 'label.private.port',
-                                                //range: ['privateport', 'privateendport']  //Bug 13427 - Don't allow port forwarding ranges in the CreatePortForwardingRule API
-                                                range: ['privateport', 'privateendport'] //Bug 16344 (restore port range back) (http://bugs.cloudstack.org/browse/CS-16344)
+                                                range: ['privateport'] //Bug 16344 (restore port range back) (http://bugs.cloudstack.org/browse/CS-16344)
                                             },
-                                            //'public-ports': {
                                             publicport: {
                                                 edit: true,
                                                 label: 'label.public.port',
-                                                //range: ['publicport', 'publicendport']  //Bug 13427 - Don't allow port forwarding ranges in the CreatePortForwardingRule API
-                                                range: ['publicport', 'publicendport'] //Bug 16344 (restore port range back) (http://bugs.cloudstack.org/browse/CS-16344)
+                                                range: ['publicport'] //Bug 16344 (restore port range back) (http://bugs.cloudstack.org/browse/CS-16344)
                                             },
                                             'protocol': {
                                                 label: 'label.protocol',
@@ -4940,12 +4935,9 @@
                                                 var data = {
                                                     ipaddressid: args.context.ipAddresses[0].id,
                                                     privateport: args.data.privateport,
-                                                    privateendport: args.data.privateendport,
                                                     publicport: args.data.publicport,
-                                                    publicendport: args.data.publicendport,
                                                     protocol: args.data.protocol,
-                                                    virtualmachineid: args.itemData[0].id,
-                                                    openfirewall: false
+                                                    virtualmachineid: args.itemData[0].id
                                                 };
 
                                                 if (args.itemData[0]._subselect && args.itemData[0]._subselect != -1) {

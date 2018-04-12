@@ -42,7 +42,6 @@ import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.ExtractResponse;
-import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.GuestOsMappingResponse;
@@ -53,7 +52,6 @@ import com.cloud.api.response.HypervisorCapabilitiesResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.InstanceGroupResponse;
-import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.IsolationMethodResponse;
 import com.cloud.api.response.LBHealthCheckPolicyResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
@@ -161,7 +159,6 @@ import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.network.vpc.NetworkACL;
 import com.cloud.network.vpc.NetworkACLItem;
@@ -858,13 +855,10 @@ public class ApiResponseHelper implements ResponseGenerator {
         lbResponse.setId(loadBalancer.getUuid());
         lbResponse.setName(loadBalancer.getName());
         lbResponse.setDescription(loadBalancer.getDescription());
-        final List<String> cidrs = ApiDBUtils.findFirewallSourceCidrs(loadBalancer.getId());
-        lbResponse.setCidrList(StringUtils.join(cidrs, ","));
-
         final IPAddressVO publicIp = ApiDBUtils.findIpAddressById(loadBalancer.getSourceIpAddressId());
         lbResponse.setPublicIpId(publicIp.getUuid());
         lbResponse.setPublicIp(publicIp.getAddress().addr());
-        lbResponse.setPublicPort(Integer.toString(loadBalancer.getSourcePortStart()));
+        lbResponse.setPublicPort(Integer.toString(loadBalancer.getSourcePort()));
         lbResponse.setPrivatePort(Integer.toString(loadBalancer.getDefaultPortStart()));
         lbResponse.setAlgorithm(loadBalancer.getAlgorithm());
         lbResponse.setLbProtocol(loadBalancer.getLbProtocol());
@@ -1077,18 +1071,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         return ApiDBUtils.newInstanceGroupResponse(vgroup);
     }
 
-  /*
-    @Override
-    public List<UserVmResponse> createUserVmResponse(String objectName, UserVm... userVms) {
-        return createUserVmResponse(null, objectName, userVms);
-    }
-
-    @Override
-    public List<UserVmResponse> createUserVmResponse(String objectName, EnumSet<VMDetails> details, UserVm... userVms) {
-        return createUserVmResponse(null, objectName, userVms);
-    }
-   */
-
     @Override
     public StoragePoolResponse createStoragePoolResponse(final StoragePool pool) {
         final List<StoragePoolJoinVO> viewPools = ApiDBUtils.newStoragePoolView(pool);
@@ -1165,13 +1147,8 @@ public class ApiResponseHelper implements ResponseGenerator {
         final FirewallRuleResponse response = new FirewallRuleResponse();
         response.setId(fwRule.getUuid());
         response.setPrivateStartPort(Integer.toString(fwRule.getDestinationPortStart()));
-        response.setPrivateEndPort(Integer.toString(fwRule.getDestinationPortEnd()));
         response.setProtocol(fwRule.getProtocol());
-        response.setPublicStartPort(Integer.toString(fwRule.getSourcePortStart()));
-        response.setPublicEndPort(Integer.toString(fwRule.getSourcePortEnd()));
-        final List<String> cidrs = ApiDBUtils.findFirewallSourceCidrs(fwRule.getId());
-        response.setCidrList(StringUtils.join(cidrs, ","));
-
+        response.setPublicStartPort(Integer.toString(fwRule.getSourcePort()));
         final Network guestNtwk = ApiDBUtils.findNetworkById(fwRule.getNetworkId());
         response.setNetworkId(guestNtwk.getUuid());
 
@@ -1213,44 +1190,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setState(stateToSet);
         response.setForDisplay(fwRule.isDisplay());
         response.setObjectName("portforwardingrule");
-        return response;
-    }
-
-    @Override
-    public IpForwardingRuleResponse createIpForwardingRuleResponse(final StaticNatRule fwRule) {
-        final IpForwardingRuleResponse response = new IpForwardingRuleResponse();
-        response.setId(fwRule.getUuid());
-        response.setProtocol(fwRule.getProtocol());
-
-        final IpAddress ip = ApiDBUtils.findIpAddressById(fwRule.getSourceIpAddressId());
-
-        if (ip != null) {
-            response.setPublicIpAddressId(ip.getId());
-            response.setPublicIpAddress(ip.getAddress().addr());
-            if (fwRule.getDestIpAddress() != null) {
-                final UserVm vm = ApiDBUtils.findUserVmById(ip.getAssociatedWithVmId());
-                if (vm != null) {// vm might be destroyed
-                    response.setVirtualMachineId(vm.getUuid());
-                    response.setVirtualMachineName(vm.getHostName());
-                    if (vm.getDisplayName() != null) {
-                        response.setVirtualMachineDisplayName(vm.getDisplayName());
-                    } else {
-                        response.setVirtualMachineDisplayName(vm.getHostName());
-                    }
-                }
-            }
-        }
-        final FirewallRule.State state = fwRule.getState();
-        String stateToSet = state.toString();
-        if (state.equals(FirewallRule.State.Revoke)) {
-            stateToSet = "Deleting";
-        }
-
-        response.setStartPort(fwRule.getSourcePortStart());
-        response.setEndPort(fwRule.getSourcePortEnd());
-        response.setProtocol(fwRule.getProtocol());
-        response.setState(stateToSet);
-        response.setObjectName("ipforwardingrule");
         return response;
     }
 
@@ -1966,56 +1905,6 @@ public class ApiResponseHelper implements ResponseGenerator {
     }
 
     @Override
-    public FirewallResponse createFirewallResponse(final FirewallRule fwRule) {
-        final FirewallResponse response = new FirewallResponse();
-
-        response.setId(fwRule.getUuid());
-        response.setProtocol(fwRule.getProtocol());
-        if (fwRule.getSourcePortStart() != null) {
-            response.setStartPort(fwRule.getSourcePortStart());
-        }
-
-        if (fwRule.getSourcePortEnd() != null) {
-            response.setEndPort(fwRule.getSourcePortEnd());
-        }
-
-        final List<String> cidrs = ApiDBUtils.findFirewallSourceCidrs(fwRule.getId());
-        response.setCidrList(StringUtils.join(cidrs, ","));
-
-        if (fwRule.getTrafficType() == FirewallRule.TrafficType.Ingress) {
-            final IpAddress ip = ApiDBUtils.findIpAddressById(fwRule.getSourceIpAddressId());
-            response.setPublicIpAddressId(ip.getUuid());
-            response.setPublicIpAddress(ip.getAddress().addr());
-        }
-
-        final Network network = ApiDBUtils.findNetworkById(fwRule.getNetworkId());
-        response.setNetworkId(network.getUuid());
-
-        final FirewallRule.State state = fwRule.getState();
-        String stateToSet = state.toString();
-        if (state.equals(FirewallRule.State.Revoke)) {
-            stateToSet = "Deleting";
-        }
-
-        response.setIcmpCode(fwRule.getIcmpCode());
-        response.setIcmpType(fwRule.getIcmpType());
-        response.setForDisplay(fwRule.isDisplay());
-
-        // set tag information
-        final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceObjectType.FirewallRule, fwRule.getId());
-        final List<ResourceTagResponse> tagResponses = new ArrayList<>();
-        for (final ResourceTag tag : tags) {
-            final ResourceTagResponse tagResponse = createResourceTagResponse(tag, true);
-            CollectionUtils.addIgnoreNull(tagResponses, tagResponse);
-        }
-        response.setTags(tagResponses);
-
-        response.setState(stateToSet);
-        response.setObjectName("firewallrule");
-        return response;
-    }
-
-    @Override
     public HypervisorCapabilitiesResponse createHypervisorCapabilitiesResponse(final HypervisorCapabilities hpvCapabilities) {
         final HypervisorCapabilitiesResponse hpvCapabilitiesResponse = new HypervisorCapabilitiesResponse();
         hpvCapabilitiesResponse.setId(hpvCapabilities.getUuid());
@@ -2342,10 +2231,6 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setProtocol(aclItem.getProtocol());
         if (aclItem.getSourcePortStart() != null) {
             response.setStartPort(Integer.toString(aclItem.getSourcePortStart()));
-        }
-
-        if (aclItem.getSourcePortEnd() != null) {
-            response.setEndPort(Integer.toString(aclItem.getSourcePortEnd()));
         }
 
         response.setCidrList(StringUtils.join(aclItem.getSourceCidrList(), ","));

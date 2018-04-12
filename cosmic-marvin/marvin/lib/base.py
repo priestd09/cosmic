@@ -330,8 +330,7 @@ class VirtualMachine:
                 ipaddressid=public_ip.ipaddress.id,
                 protocol='TCP',
                 cidrlist=['0.0.0.0/0'],
-                startport=22,
-                endport=22
+                startport=22
             )
         elif network is not None:
             acl_list = NetworkACLList.list(
@@ -352,7 +351,6 @@ class VirtualMachine:
 
                 services_acl = { "protocol": services["protocol"] if "protocol" in services else 'TCP',
                                  "startport": services["publicport"] if "publicport" in services else 22,
-                                 "endport": services["publicport"] if "publicport" in services else 22,
                                  "cidrlist": ['0.0.0.0/0'], "action": 'Allow', "traffictype": 'Ingress' }
 
                 ace_number = 1
@@ -1559,7 +1557,7 @@ class NATRule:
         self.__dict__.update(items)
 
     @classmethod
-    def create(cls, api_client, virtual_machine, services=None, ipaddressid=None, projectid=None, openfirewall=False,
+    def create(cls, api_client, virtual_machine, services=None, ipaddressid=None, projectid=None,
                networkid=None, network=None, vpcid=None, vpc=None, vmguestip=None, ipaddress=None, data=None):
         """Create Port forwarding rule"""
         if data:
@@ -1576,22 +1574,11 @@ class NATRule:
 
         cmd.privateport = services["privateport"]
         cmd.publicport = services["publicport"]
-        if "privateendport" in services:
-            cmd.privateendport = services["privateendport"]
-        if "publicendport" in services:
-            cmd.publicendport = services["publicendport"]
         cmd.protocol = services["protocol"]
         cmd.virtualmachineid = virtual_machine.id
 
         if projectid:
             cmd.projectid = projectid
-
-        if 'openfirewall' in services:
-            cmd.openfirewall = services['openfirewall']
-
-        if openfirewall:
-            # FIXME: it should be `cmd.openfirewall = openfirewall`, not changed for backwards compatibility
-            cmd.openfirewall = True
 
         if networkid:
             cmd.networkid = networkid
@@ -1641,9 +1628,6 @@ class StaticNATRule:
         cmd.protocol = services["protocol"]
         cmd.startport = services["startport"]
 
-        if "endport" in services:
-            cmd.endport = services["endport"]
-
         if "cidrlist" in services:
             cmd.cidrlist = services["cidrlist"]
 
@@ -1660,14 +1644,12 @@ class StaticNATRule:
         return StaticNATRule(api_client.createFirewallRule(cmd).__dict__)
 
     @classmethod
-    def createIpForwardingRule(cls, api_client, startport, endport, protocol, ipaddressid, openfirewall):
+    def createIpForwardingRule(cls, api_client, startport, protocol, ipaddressid):
         """Creates static ip forwarding rule"""
 
         cmd = createIpForwardingRule.createIpForwardingRuleCmd()
         cmd.startport = startport
-        cmd.endport = endport
         cmd.protocol = protocol
-        cmd.openfirewall = openfirewall
         cmd.ipaddressid = ipaddressid
         return StaticNATRule(api_client.createIpForwardingRule(cmd).__dict__)
 
@@ -1722,7 +1704,7 @@ class EgressFireWallRule:
 
     @classmethod
     def create(cls, api_client, networkid=None, protocol=None, cidrlist=None,
-               startport=None, endport=None, type=None, code=None, network=None, data=None):
+               startport=None, type=None, code=None, network=None, data=None):
         """Create Egress Firewall Rule"""
         cmd = createEgressFirewallRule.createEgressFirewallRuleCmd()
         if networkid:
@@ -1741,10 +1723,6 @@ class EgressFireWallRule:
             cmd.startport = startport
         elif 'startport' in data:
             cmd.startport = data['startport']
-        if endport:
-            cmd.endport = endport
-        elif 'endport' in data:
-            cmd.endport = data['endport']
         if type:
             cmd.type = type
         if code:
@@ -1779,7 +1757,7 @@ class FireWallRule:
 
     @classmethod
     def create(cls, api_client, ipaddressid=None, protocol=None, cidrlist=None,
-               startport=None, endport=None, projectid=None, vpcid=None, data=None, ipaddress=None):
+               startport=None, projectid=None, vpcid=None, data=None, ipaddress=None):
         """Create Firewall Rule"""
         cmd = createFirewallRule.createFirewallRuleCmd()
         if ipaddressid:
@@ -1798,10 +1776,6 @@ class FireWallRule:
             cmd.startport = startport
         elif 'startport' in data:
             cmd.startport = data['startport']
-        if endport:
-            cmd.endport = endport
-        elif 'endport' in data:
-            cmd.endport = data['endport']
 
         if projectid:
             cmd.projectid = projectid
@@ -2106,9 +2080,6 @@ class LoadBalancerRule:
         cmd.algorithm = services["alg"]
         cmd.privateport = services["privateport"]
         cmd.publicport = services["publicport"]
-
-        if "openfirewall" in services:
-            cmd.openfirewall = services["openfirewall"]
 
         if projectid:
             cmd.projectid = projectid
@@ -2735,8 +2706,6 @@ class NetworkACL:
 
         if "startport" in services:
             cmd.startport = services["startport"]
-        if "endport" in services:
-            cmd.endport = services["endport"]
 
         if "cidrlist" in services:
             cmd.cidrlist = services["cidrlist"]
@@ -2854,7 +2823,7 @@ class Vpn:
 
     @classmethod
     def create(cls, api_client, publicipid, account=None, domainid=None,
-               projectid=None, networkid=None, vpcid=None, openfirewall=None, iprange=None, fordisplay=False):
+               projectid=None, networkid=None, vpcid=None, iprange=None, fordisplay=False):
         """Create VPN for Public IP address"""
         cmd = createRemoteAccessVpn.createRemoteAccessVpnCmd()
         cmd.publicipid = publicipid
@@ -2870,8 +2839,6 @@ class Vpn:
             cmd.vpcid = vpcid
         if iprange:
             cmd.iprange = iprange
-        if openfirewall:
-            cmd.openfirewall = openfirewall
 
         cmd.fordisplay = fordisplay
         return Vpn(api_client.createRemoteAccessVpn(cmd).__dict__)

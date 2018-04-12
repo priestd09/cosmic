@@ -53,7 +53,6 @@ import com.cloud.network.lb.LoadBalancingRule.LbSslCert;
 import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
 import com.cloud.network.rules.FirewallManager;
 import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.FirewallRuleType;
 import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.HealthCheckPolicy;
@@ -237,14 +236,7 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
             }
         }
 
-        final FirewallRuleVO relatedRule = _firewallDao.findByRelatedId(lb.getId());
-        if (relatedRule != null) {
-            s_logger.warn("Unable to remove firewall rule id=" + lb.getId() + " as it has related firewall rule id=" + relatedRule.getId() +
-                    "; leaving it in Revoke state");
-            return false;
-        } else {
-            _firewallMgr.removeRule(lb);
-        }
+        _firewallMgr.removeRule(lb);
 
         s_logger.debug("Load balancer with id " + lb.getId() + " is removed successfully");
 
@@ -255,7 +247,7 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
     @ActionEvent(eventType = EventTypes.EVENT_LOAD_BALANCER_CREATE, eventDescription = "creating load balancer")
     public LoadBalancer createPublicLoadBalancerRule(final String xId, final String name, final String description, final int srcPortStart, final int srcPortEnd,
                                                      final int defPortStart, final int defPortEnd, final Long ipAddrId, final String protocol, final String algorithm,
-                                                     final long networkId, final long lbOwnerId, final boolean openFirewall, final String lbProtocol, final Boolean forDisplay,
+                                                     final long networkId, final long lbOwnerId, final String lbProtocol, final Boolean forDisplay,
                                                      Integer clientTimeout, Integer serverTimeout) throws NetworkRuleConflictException, InsufficientAddressCapacityException {
         final Account lbOwner = _accountMgr.getAccount(lbOwnerId);
 
@@ -324,8 +316,8 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
                     serverTimeout = defaultServerTimeout;
                 }
 
-                result = createPublicLoadBalancer(xId, name, description, srcPortStart, defPortStart, ipVO.getId(), protocol, algorithm, openFirewall, CallContext.current(),
-                        lbProtocol, forDisplay, clientTimeout, serverTimeout);
+                result = createPublicLoadBalancer(xId, name, description, srcPortStart, defPortStart, ipVO.getId(), protocol, algorithm, CallContext.current(), lbProtocol, forDisplay,
+                        clientTimeout, serverTimeout);
             } catch (final Exception ex) {
                 s_logger.warn("Failed to create load balancer due to ", ex);
                 if (ex instanceof NetworkRuleConflictException) {
@@ -358,7 +350,7 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
     @DB
     @Override
     public LoadBalancer createPublicLoadBalancer(final String xId, final String name, final String description, final int srcPort, final int destPort, final long sourceIpId,
-                                                 final String protocol, final String algorithm, final boolean openFirewall, final CallContext caller, final String lbProtocol,
+                                                 final String protocol, final String algorithm, final CallContext caller, final String lbProtocol,
                                                  final Boolean forDisplay, final int clientTimeout, final int serverTimeout)
             throws NetworkRuleConflictException {
 
@@ -399,7 +391,7 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
         // verify that lb service is supported by the network
         isLbServiceSupportedInNetwork(networkId, Scheme.Public);
 
-        _firewallMgr.validateFirewallRule(caller.getCallingAccount(), ipAddr, srcPort, srcPort, protocol, Purpose.LoadBalancing, FirewallRuleType.User, networkId, null);
+        _firewallMgr.validateFirewallRule(caller.getCallingAccount(), ipAddr, srcPort, protocol, Purpose.LoadBalancing, networkId, null);
 
         final LoadBalancerVO newRule =
                 new LoadBalancerVO(xId, name, description, sourceIpId, srcPort, destPort, algorithm, networkId, ipAddr.getAllocatedToAccountId(),
@@ -436,11 +428,6 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
 
                 newRule = _lbDao.persist(newRule);
 
-                //create rule for all CIDRs
-                if (openFirewall) {
-                    _firewallMgr.createRuleForAllCidrs(sourceIpId, caller.getCallingAccount(), srcPort, srcPort, protocol, null, null, newRule.getId(), networkId);
-                }
-
                 boolean success = true;
 
                 try {
@@ -461,7 +448,6 @@ public class LoadBalancingRulesManagerImpl extends ManagerBase implements LoadBa
                     throw new CloudRuntimeException("Unable to add rule for ip address id=" + newRule.getSourceIpAddressId(), e);
                 } finally {
                     if (!success && newRule != null) {
-                        _firewallMgr.revokeRelatedFirewallRule(newRule.getId(), false);
                         removeLBRule(newRule);
                     }
                 }

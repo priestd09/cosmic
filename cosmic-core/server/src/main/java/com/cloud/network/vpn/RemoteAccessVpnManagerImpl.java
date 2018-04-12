@@ -33,7 +33,6 @@ import com.cloud.network.element.RemoteAccessVPNServiceProvider;
 import com.cloud.network.rules.FirewallManager;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
@@ -106,7 +105,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
 
     @Override
     @DB
-    public RemoteAccessVpn createRemoteAccessVpn(final long publicIpId, String ipRange, boolean openFirewall, final Boolean forDisplay) throws NetworkRuleConflictException {
+    public RemoteAccessVpn createRemoteAccessVpn(final long publicIpId, String ipRange, final Boolean forDisplay) throws NetworkRuleConflictException {
         final CallContext ctx = CallContext.current();
         final Account caller = ctx.getCallingAccount();
 
@@ -132,15 +131,6 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
         }
 
         final Long vpcId = ipAddress.getVpcId();
-        /* IP Address used for VPC must be the source NAT IP of whole VPC */
-        if (vpcId != null && ipAddress.isSourceNat()) {
-            assert networkId == null;
-            // No firewall setting for VPC, it would be open internally
-            openFirewall = false;
-        }
-
-        final boolean openFirewallFinal = openFirewall;
-
         if (networkId == null && vpcId == null) {
             throw new InvalidParameterValueException("Unable to create remote access vpn for the ipAddress: " + ipAddr.getAddress().addr() +
                     " as ip is not associated with any network or VPC");
@@ -210,7 +200,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
             @Override
             public RemoteAccessVpn doInTransaction(final TransactionStatus status) throws NetworkRuleConflictException {
                 if (vpcId == null) {
-                    _rulesMgr.reservePorts(ipAddr, NetUtils.UDP_PROTO, Purpose.Vpn, openFirewallFinal, caller, NetUtils.VPN_PORT, NetUtils.VPN_L2TP_PORT,
+                    _rulesMgr.reservePorts(ipAddr, NetUtils.UDP_PROTO, Purpose.Vpn, caller, NetUtils.VPN_PORT, NetUtils.VPN_L2TP_PORT,
                             NetUtils.VPN_NATT_PORT);
                 }
                 final RemoteAccessVpnVO vpnVO =
@@ -260,51 +250,23 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
                 //Cleanup corresponding ports
                 final List<? extends FirewallRule> vpnFwRules = _rulesDao.listByIpAndPurpose(ipId, Purpose.Vpn);
 
-                boolean applyFirewall = false;
-                final List<FirewallRuleVO> fwRules = new ArrayList<>();
-                //if related firewall rule is created for the first vpn port, it would be created for the 2 other ports as well, so need to cleanup the backend
-                if (vpnFwRules.size() != 0 && _rulesDao.findByRelatedId(vpnFwRules.get(0).getId()) != null) {
-                    applyFirewall = true;
-                }
-
-                if (applyFirewall) {
+                try {
                     Transaction.execute(new TransactionCallbackNoReturn() {
                         @Override
                         public void doInTransactionWithoutResult(final TransactionStatus status) {
-                            for (final FirewallRule vpnFwRule : vpnFwRules) {
-                                //don't apply on the backend yet; send all 3 rules in a banch
-                                _firewallMgr.revokeRelatedFirewallRule(vpnFwRule.getId(), false);
-                                fwRules.add(_rulesDao.findByRelatedId(vpnFwRule.getId()));
-                            }
-
-                            s_logger.debug("Marked " + fwRules.size() + " firewall rules as Revoked as a part of disable remote access vpn");
-                        }
-                    });
-
-                    //now apply vpn rules on the backend
-                    s_logger.debug("Reapplying firewall rules for ip id=" + ipId + " as a part of disable remote access vpn");
-                    success = _firewallMgr.applyIngressFirewallRules(ipId, caller);
-                }
-
-                if (success) {
-                    try {
-                        Transaction.execute(new TransactionCallbackNoReturn() {
-                            @Override
-                            public void doInTransactionWithoutResult(final TransactionStatus status) {
-                                _remoteAccessVpnDao.remove(vpn.getId());
-                                // Stop billing of VPN users when VPN is removed. VPN_User_ADD events will be generated when VPN is created again
-                                if (vpnFwRules != null) {
-                                    for (final FirewallRule vpnFwRule : vpnFwRules) {
-                                        _rulesDao.remove(vpnFwRule.getId());
-                                        s_logger.debug("Successfully removed firewall rule with ip id=" + vpnFwRule.getSourceIpAddressId() + " and port " +
-                                                vpnFwRule.getSourcePortStart().intValue() + " as a part of vpn cleanup");
-                                    }
+                            _remoteAccessVpnDao.remove(vpn.getId());
+                            // Stop billing of VPN users when VPN is removed. VPN_User_ADD events will be generated when VPN is created again
+                            if (vpnFwRules != null) {
+                                for (final FirewallRule vpnFwRule : vpnFwRules) {
+                                    _rulesDao.remove(vpnFwRule.getId());
+                                    s_logger.debug("Successfully removed firewall rule with ip id=" + vpnFwRule.getSourceIpAddressId() + " and port " +
+                                            vpnFwRule.getSourcePort() + " as a part of vpn cleanup");
                                 }
                             }
-                        });
-                    } catch (final Exception ex) {
-                        s_logger.warn("Unable to release the three vpn ports from the firewall rules", ex);
-                    }
+                        }
+                    });
+                } catch (final Exception ex) {
+                    s_logger.warn("Unable to release the three vpn ports from the firewall rules", ex);
                 }
             }
         }
@@ -314,7 +276,7 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
     @Override
     @DB
     @ActionEvent(eventType = EventTypes.EVENT_REMOTE_ACCESS_VPN_CREATE, eventDescription = "creating remote access vpn", async = true)
-    public RemoteAccessVpnVO startRemoteAccessVpn(final long ipAddressId, boolean openFirewall) throws ResourceUnavailableException {
+    public RemoteAccessVpnVO startRemoteAccessVpn(final long ipAddressId) throws ResourceUnavailableException {
         final Account caller = CallContext.current().getCallingAccount();
 
         final RemoteAccessVpnVO vpn = _remoteAccessVpnDao.findByPublicIpAddress(ipAddressId);
@@ -322,18 +284,11 @@ public class RemoteAccessVpnManagerImpl extends ManagerBase implements RemoteAcc
             throw new InvalidParameterValueException("Unable to find your vpn: " + ipAddressId);
         }
 
-        if (vpn.getVpcId() != null) {
-            openFirewall = false;
-        }
-
         _accountMgr.checkAccess(caller, null, true, vpn);
 
         boolean started = false;
         try {
             boolean firewallOpened = true;
-            if (openFirewall) {
-                firewallOpened = _firewallMgr.applyIngressFirewallRules(vpn.getServerAddressId(), caller);
-            }
 
             if (firewallOpened) {
                 for (final RemoteAccessVPNServiceProvider element : _vpnServiceProviders) {

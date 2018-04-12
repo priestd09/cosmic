@@ -8,24 +8,10 @@ import com.cloud.api.InternalIdentity;
 import java.util.List;
 
 public interface FirewallRule extends ControlledEntity, Identity, InternalIdentity, Displayable {
-    /**
-     * @return external id.
-     */
     String getXid();
 
-    /**
-     * @return first port of the source port range.
-     */
-    Integer getSourcePortStart();
+    Integer getSourcePort();
 
-    /**
-     * @return last port of the source prot range.  If this is null, that means only one port is mapped.
-     */
-    Integer getSourcePortEnd();
-
-    /**
-     * @return protocol to open these ports for.
-     */
     String getProtocol();
 
     Purpose getPurpose();
@@ -42,25 +28,17 @@ public interface FirewallRule extends ControlledEntity, Identity, InternalIdenti
 
     List<String> getSourceCidrList();
 
-    Long getRelated();
-
-    FirewallRuleType getType();
-
-    /**
-     * @return
-     */
     TrafficType getTrafficType();
 
     @Override
     boolean isDisplay();
 
     enum Purpose {
-        Firewall, PortForwarding, LoadBalancing, Vpn, StaticNat, NetworkACL,
-    }
-
-    enum FirewallRuleType {
-        System, // The pre-defined rules created by admin, in the system wide
-        User // the rules created by user, to a specific ip
+        PortForwarding,
+        LoadBalancing,
+        Vpn,
+        StaticNat,
+        NetworkACL,
     }
 
     enum State {
