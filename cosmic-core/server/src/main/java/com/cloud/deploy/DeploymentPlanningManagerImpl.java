@@ -741,8 +741,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                             }
                             requestVolumes.add(vol);
 
-                            if (!_storageMgr.storagePoolHasEnoughIops(requestVolumes, potentialSPool) ||
-                                    !_storageMgr.storagePoolHasEnoughSpace(requestVolumes, potentialSPool)) {
+                            if (!_storageMgr.storagePoolHasEnoughSpace(requestVolumes, potentialSPool)) {
                                 continue;
                             }
                             volumeAllocationMap.put(potentialSPool, requestVolumes);

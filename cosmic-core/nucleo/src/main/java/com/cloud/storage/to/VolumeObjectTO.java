@@ -30,6 +30,7 @@ public class VolumeObjectTO implements DataTO {
     private Long iopsReadRate;
     private Long iopsWriteRate;
     private Long iopsTotalRate;
+    private Boolean iopsRatePerGb;
     private DiskCacheMode cacheMode;
     private Hypervisor.HypervisorType hypervisorType;
 
@@ -60,6 +61,7 @@ public class VolumeObjectTO implements DataTO {
         iopsReadRate = volume.getIopsReadRate();
         iopsWriteRate = volume.getIopsWriteRate();
         iopsTotalRate = volume.getIopsTotalRate();
+        iopsRatePerGb = volume.getIopsRatePerGb();
         cacheMode = volume.getCacheMode();
         hypervisorType = volume.getHypervisorType();
         setDeviceId(volume.getDeviceId());
@@ -225,6 +227,14 @@ public class VolumeObjectTO implements DataTO {
 
     public void setIopsTotalRate(Long iopsTotalRate) {
         this.iopsTotalRate = iopsTotalRate;
+    }
+
+    public Boolean getIopsRatePerGb() {
+        return iopsRatePerGb;
+    }
+
+    public void setIopsRatePerGb(Boolean iopsRatePerGb) {
+        this.iopsRatePerGb = iopsRatePerGb;
     }
 
     public Long getDeviceId() {

@@ -62,6 +62,10 @@ public interface DiskOffering extends InfrastructureEntity, Identity, InternalId
 
     void setIopsTotalRate(Long iopsTotalRate);
 
+    Boolean getIopsRatePerGb();
+
+    void setIopsRatePerGb(Boolean iopsRatePerGb);
+
     Integer getHypervisorSnapshotReserve();
 
     void setHypervisorSnapshotReserve(Integer hypervisorSnapshotReserve);

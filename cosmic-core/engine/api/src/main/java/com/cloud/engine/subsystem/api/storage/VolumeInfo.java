@@ -40,6 +40,8 @@ public interface VolumeInfo extends DataObject, Volume {
 
     Long getIopsTotalRate();
 
+    Boolean getIopsRatePerGb();
+
     DiskCacheMode getCacheMode();
 
     DiskControllerType getDiskController();

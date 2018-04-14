@@ -33,12 +33,11 @@ import com.cloud.utils.storage.encoding.EncodingType;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.VMInstanceDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Date;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class VolumeObject implements VolumeInfo {
     private static final Logger s_logger = LoggerFactory.getLogger(VolumeObject.class);
@@ -237,15 +236,6 @@ public class VolumeObject implements VolumeInfo {
         return null;
     }
 
-    private Long getIopsRate(Long iopsRate) {
-        long diskSize = getSize() >> 30;
-        if (iopsRate != null && iopsRate > 0) {
-            return iopsRate * diskSize;
-        } else {
-            return iopsRate;
-        }
-    }
-
     @Override
     public Long getIopsReadRate() {
         final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
@@ -274,6 +264,33 @@ public class VolumeObject implements VolumeInfo {
             return getIopsRate(iopsTotalRate);
         }
         return null;
+    }
+
+    @Override
+    public Boolean getIopsRatePerGb() {
+        final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
+        if (diskOfferingVO != null) {
+            Boolean iopsRatePerGb = diskOfferingVO.getIopsRatePerGb();
+            return iopsRatePerGb;
+        }
+        return null;
+    }
+
+    /**
+     * Calculates the IOPS per GB if iops_rate_per_gb flag is set. If disk is smaller than a GB then
+     * return iopsRate as minimum.
+     *
+     * @param iopsRate IOPS to use for calculation
+     * @return IOPS calculated per GB
+     */
+    private Long getIopsRate(Long iopsRate) {
+        if (getIopsRatePerGb()) {
+            long diskSize = getSize() >> 30;
+            if (iopsRate != null && iopsRate > 0 && diskSize > 0) {
+                return iopsRate * diskSize;
+            }
+        }
+        return iopsRate;
     }
 
     @Override

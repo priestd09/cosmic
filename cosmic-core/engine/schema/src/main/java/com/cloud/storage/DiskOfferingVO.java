@@ -53,6 +53,8 @@ public class DiskOfferingVO implements DiskOffering {
     Long iopsWriteRate;
     @Column(name = "iops_total_rate")
     Long iopsTotalRate;
+    @Column(name = "iops_rate_per_gb")
+    Boolean iopsRatePerGb;
     @Column(name = "provisioning_type")
     Storage.ProvisioningType provisioningType;
     @Column(name = "display_offering")
@@ -337,6 +339,16 @@ public class DiskOfferingVO implements DiskOffering {
     @Override
     public void setIopsTotalRate(Long iopsTotalRate) {
         this.iopsTotalRate = iopsTotalRate;
+    }
+
+    @Override
+    public Boolean getIopsRatePerGb() {
+        return iopsRatePerGb;
+    }
+
+    @Override
+    public void setIopsRatePerGb(Boolean iopsRatePerGb) {
+        this.iopsRatePerGb = iopsRatePerGb;
     }
 
     @Override

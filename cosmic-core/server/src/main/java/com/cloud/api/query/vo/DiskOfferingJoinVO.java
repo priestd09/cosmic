@@ -34,6 +34,8 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
     Long iopsWriteRate;
     @Column(name = "iops_total_rate")
     Long iopsTotalRate;
+    @Column(name = "iops_rate_per_gb")
+    Boolean iopsRatePerGb;
     @Column(name = "cache_mode")
     String cacheMode;
     @Column(name = "type")
@@ -107,6 +109,10 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
 
     public void setIopsTotalRate(final Long iopsTotalRate) {
         this.iopsTotalRate = iopsTotalRate;
+    }
+
+    public void setIopsRatePerGb(Boolean iopsRatePerGb) {
+        this.iopsRatePerGb = iopsRatePerGb;
     }
 
     public void setType(final Type type) {
@@ -278,7 +284,12 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
     }
+
     public Long getIopsTotalRate() {
         return iopsTotalRate;
+    }
+
+    public Boolean getIopsRatePerGb() {
+        return iopsRatePerGb;
     }
 }

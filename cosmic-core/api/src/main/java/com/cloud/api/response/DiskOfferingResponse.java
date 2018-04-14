@@ -5,10 +5,9 @@ import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.offering.DiskOffering;
 import com.cloud.serializer.Param;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
-
-import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = DiskOffering.class)
 public class DiskOfferingResponse extends BaseResponse {
@@ -69,16 +68,20 @@ public class DiskOfferingResponse extends BaseResponse {
     private Long bytesWriteRate;
 
     @SerializedName("diskIopsReadRate")
-    @Param(description = "io requests read rate per GB of the disk offering")
+    @Param(description = "io requests read rate of the disk offering")
     private Long iopsReadRate;
 
     @SerializedName("diskIopsWriteRate")
-    @Param(description = "io requests write rate per GB of the disk offering")
+    @Param(description = "io requests write rate of the disk offering")
     private Long iopsWriteRate;
 
     @SerializedName("diskIopsTotalRate")
-    @Param(description = "io requests total rate per GB of the disk offering")
+    @Param(description = "io requests total rate of the disk offering")
     private Long iopsTotalRate;
+
+    @SerializedName("diskIopsRatePerGb")
+    @Param(description = "io requests per GB")
+    private Boolean iopsRatePerGb;
 
     @SerializedName("cacheMode")
     @Param(description = "the cache mode to use for this disk offering. none, writeback or writethrough", since = "4.4")
@@ -215,8 +218,16 @@ public class DiskOfferingResponse extends BaseResponse {
     public void setIopsWriteRate(final Long iopsWriteRate) {
         this.iopsWriteRate = iopsWriteRate;
     }
+
     public void setIopsTotalRate(final Long iopsTotalRate) {
         this.iopsTotalRate = iopsTotalRate;
     }
 
+    public Boolean getIopsRatePerGb() {
+        return iopsRatePerGb;
+    }
+
+    public void setIopsRatePerGb(Boolean iopsRatePerGb) {
+        this.iopsRatePerGb = iopsRatePerGb;
+    }
 }

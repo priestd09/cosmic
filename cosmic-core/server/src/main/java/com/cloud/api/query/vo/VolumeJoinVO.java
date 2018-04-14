@@ -56,6 +56,8 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     Long iopsWriteRate;
     @Column(name = "iops_total_rate")
     Long iopsTotalRate;
+    @Column(name = "iops_rate_per_gb")
+    Boolean iopsRatePerGb;
     @Column(name = "cache_mode")
     String cacheMode;
     @Column(name = "chain_info", length = 65535)
@@ -250,6 +252,14 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setIopsWriteRate(final Long iopsWriteRate) {
         this.iopsWriteRate = iopsWriteRate;
+    }
+
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
+    }
+
+    public void setIopsRatePerGb(Boolean iopsRatePerGb) {
+        this.iopsRatePerGb = iopsRatePerGb;
     }
 
     public void setCacheMode(final String cacheMode) {
@@ -857,7 +867,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         return iopsTotalRate;
     }
 
-    public void setIopsTotalRate(Long iopsTotalRate) {
-        this.iopsTotalRate = iopsTotalRate;
+    public Boolean getIopsRatePerGb() {
+        return iopsRatePerGb;
     }
 }

@@ -1,6 +1,7 @@
--- Add iops_total_rate column to disk_offering and disk_offering_view
+-- Add iops_total_rate column and iops_rate_per_gb to disk_offering and disk_offering_view
 ALTER TABLE `disk_offering`
-  ADD COLUMN `iops_total_rate` LONG;
+  ADD COLUMN `iops_total_rate` BIGINT,
+  ADD COLUMN `iops_rate_per_gb` BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- Update the volume_view
 DROP VIEW IF EXISTS `volume_view`;
@@ -62,6 +63,7 @@ CREATE VIEW `volume_view` AS
     `cloud`.`disk_offering`.`iops_read_rate`        AS `iops_read_rate`,
     `cloud`.`disk_offering`.`iops_write_rate`       AS `iops_write_rate`,
     `cloud`.`disk_offering`.`iops_total_rate`       AS `iops_total_rate`,
+    `cloud`.`disk_offering`.`iops_rate_per_gb`      AS `iops_rate_per_gb`,
     `cloud`.`disk_offering`.`cache_mode`            AS `cache_mode`,
     `cloud`.`storage_pool`.`id`                     AS `pool_id`,
     `cloud`.`storage_pool`.`uuid`                   AS `pool_uuid`,
@@ -130,6 +132,7 @@ ALTER VIEW `disk_offering_view`
     `cloud`.`disk_offering`.`iops_read_rate`        AS `iops_read_rate`,
     `cloud`.`disk_offering`.`iops_write_rate`       AS `iops_write_rate`,
     `cloud`.`disk_offering`.`iops_total_rate`       AS `iops_total_rate`,
+    `cloud`.`disk_offering`.`iops_rate_per_gb`      AS `iops_rate_per_gb`,
     `cloud`.`disk_offering`.`cache_mode`            AS `cache_mode`,
     `cloud`.`disk_offering`.`sort_key`              AS `sort_key`,
     `cloud`.`disk_offering`.`type`                  AS `type`,
@@ -200,6 +203,7 @@ AS SELECT
     `cloud`.`disk_offering`.`iops_read_rate`        AS `iops_read_rate`,
     `cloud`.`disk_offering`.`iops_write_rate`       AS `iops_write_rate`,
     `cloud`.`disk_offering`.`iops_total_rate`       AS `iops_total_rate`,
+    `cloud`.`disk_offering`.`iops_rate_per_gb`      AS `iops_rate_per_gb`,
     `cloud`.`disk_offering`.`cache_mode`            AS `cache_mode`,
     `cloud`.`storage_pool`.`id`                     AS `pool_id`,
     `cloud`.`storage_pool`.`uuid`                   AS `pool_uuid`,
@@ -270,6 +274,7 @@ AS SELECT
    `cloud`.`disk_offering`.`bytes_write_rate`       AS `bytes_write_rate`,
    `cloud`.`disk_offering`.`iops_read_rate`         AS `iops_read_rate`,
    `cloud`.`disk_offering`.`iops_write_rate`        AS `iops_write_rate`,
+   `cloud`.`disk_offering`.`iops_rate_per_gb`       AS `iops_rate_per_gb`,
    `cloud`.`disk_offering`.`iops_total_rate`        AS `iops_total_rate`,
    `cloud`.`disk_offering`.`cache_mode`             AS `cache_mode`,
    `cloud`.`service_offering`.`cpu`                 AS `cpu`,

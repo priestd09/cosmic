@@ -219,7 +219,7 @@ public class LibvirtDiskDef {
     }
 
     public void setIopsTotalRate(final Long iopsTotalRate) {
-        this.iopsTotalRate = iopsTotalRate ;
+        this.iopsTotalRate = iopsTotalRate;
     }
 
     public DiskCacheMode getCacheMode() {
