@@ -385,6 +385,17 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         buf.append(" role=").append(vm.getRole().toString());
         buf.append(" mtu=").append(_secStorageVmMtuSize);
 
+        _allowedExternalCidrs = _configDao.getValue("secstorage.allowed.external.cidrs");
+        if (_allowedExternalCidrs != null) {
+            buf.append(" allowed_external_cidrs=").append(_allowedExternalCidrs);
+        }
+
+        _allowedInternalSites = _configDao.getValue("secstorage.allowed.internal.sites");
+        if (_allowedInternalSites != null) {
+            buf.append(" allowed_internal_cidrs=").append(_allowedInternalSites);
+
+        }
+
         boolean externalDhcp = false;
         final String externalDhcpStr = _configDao.getValue("direct.attach.network.externalIpAllocator.enabled");
         if (externalDhcpStr != null && externalDhcpStr.equalsIgnoreCase("true")) {
@@ -949,17 +960,6 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
 
         final SecStorageVMSetupCommand setupCmd = new SecStorageVMSetupCommand();
-        _allowedInternalSites = _configDao.getValue("secstorage.allowed.internal.sites");
-        if (_allowedInternalSites != null) {
-            final List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedInternalSites);
-            setupCmd.setAllowedInternalSites(allowedCidrs.toArray(new String[allowedCidrs.size()]));
-        }
-
-        _allowedExternalCidrs = _configDao.getValue("secstorage.allowed.external.cidrs");
-        if (_allowedExternalCidrs != null) {
-            final List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedExternalCidrs);
-            setupCmd.setAllowedExternalCidrs(allowedCidrs.toArray(new String[allowedCidrs.size()]));
-        }
 
         final String copyPasswd = _configDao.getValue("secstorage.copy.password");
         setupCmd.setCopyPassword(copyPasswd);
@@ -972,17 +972,6 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             logger.debug("failed to program http auth into secondary storage vm : " + secStorageVm.getHostName());
             return false;
         }
-    }
-
-    private List<String> GenerateAllowedCidrs(final String cidrList) {
-        final List<String> allowedCidrs = new ArrayList<>();
-        final String[] cidrs = cidrList.split(",");
-        for (final String cidr : cidrs) {
-            if (NetUtils.isValidIp4Cidr(cidr) || NetUtils.isValidIp4(cidr) || !cidr.startsWith("0.0.0.0")) {
-                allowedCidrs.add(cidr);
-            }
-        }
-        return allowedCidrs;
     }
 
     @Override
