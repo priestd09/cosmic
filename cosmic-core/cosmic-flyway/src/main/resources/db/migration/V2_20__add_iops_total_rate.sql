@@ -109,7 +109,7 @@ CREATE VIEW `volume_view` AS
 
 -- Update the disk_offering_view
 DROP VIEW IF EXISTS `disk_offering_view`;
-ALTER VIEW `disk_offering_view`
+CREATE VIEW `disk_offering_view`
   AS SELECT
     `cloud`.`disk_offering`.`id`                    AS `id`,
     `cloud`.`disk_offering`.`uuid`                  AS `uuid`,
@@ -146,7 +146,7 @@ ALTER VIEW `disk_offering_view`
 
 -- Update the volume_view
 DROP VIEW IF EXISTS `volume_view`;
-ALTER VIEW `volume_view`
+CREATE VIEW `volume_view`
 AS SELECT
     `cloud`.`volumes`.`id`                          AS `id`,
     `cloud`.`volumes`.`uuid`                        AS `uuid`,
@@ -254,7 +254,7 @@ FROM ((((((((((((((`volumes`
 
 -- Update the service_offering_view
 DROP VIEW IF EXISTS `service_offering_view`;
-ALTER VIEW `service_offering_view`
+CREATE VIEW `service_offering_view`
 AS SELECT
    `cloud`.`service_offering`.`id`                  AS `id`,
    `cloud`.`disk_offering`.`uuid`                   AS `uuid`,

@@ -788,10 +788,12 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             }
         }
 
+        final Boolean iopsRatePerGb = cmd.getIopsRatePerGb() != null ? cmd.getIopsRatePerGb() : false;
+
         return createServiceOffering(userId, cmd.getIsSystem(), vmType, cmd.getServiceOfferingName(), cpuNumber, memory, cmd.getDisplayText(),
                 cmd.getProvisioningType(), localStorageRequired, offerHA, limitCpuUse, volatileVm, cmd.getTags(), cmd.getDomainId(), cmd.getHostTag(),
                 cmd.getNetworkRate(), cmd.getDeploymentPlanner(), cmd.getDetails(), cmd.getBytesReadRate(), cmd.getBytesWriteRate(),
-                cmd.getIopsReadRate(), cmd.getIopsWriteRate(), cmd.getIopsTotalRate(), cmd.getIopsRatePerGb(), cmd.getHypervisorSnapshotReserve());
+                cmd.getIopsReadRate(), cmd.getIopsWriteRate(), cmd.getIopsTotalRate(), iopsRatePerGb, cmd.getHypervisorSnapshotReserve());
     }
 
     protected ServiceOfferingVO createServiceOffering(final long userId, final boolean isSystem, final VirtualMachine.Type vmType,
@@ -1156,7 +1158,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final Long iopsReadRate = cmd.getIopsReadRate();
         final Long iopsWriteRate = cmd.getIopsWriteRate();
         final Long iopsTotalRate = cmd.getIopsTotalRate();
-        final Boolean iopsRatePerGb = cmd.getIopsRatePerGb();
+        final Boolean iopsRatePerGb = cmd.getIopsRatePerGb() != null ? cmd.getIopsRatePerGb() : false;
         final Integer hypervisorSnapshotReserve = cmd.getHypervisorSnapshotReserve();
 
         final Long userId = CallContext.current().getCallingUserId();

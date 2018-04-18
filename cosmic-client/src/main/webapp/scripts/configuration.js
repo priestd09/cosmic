@@ -183,6 +183,7 @@
                                                 var $diskIopsReadRate = $form.find('.form-item[rel=diskIopsReadRate]');
                                                 var $diskIopsWriteRate = $form.find('.form-item[rel=diskIopsWriteRate]');
                                                 var $diskIopsTotalRate = $form.find('.form-item[rel=diskIopsTotalRate]');
+                                                var $diskIopsRatePerGb = $form.find('.form-item[rel=diskIopsRatePerGb]');
 
                                                 var qosId = $(this).val();
 
@@ -191,6 +192,7 @@
                                                     $diskBytesWriteRate.hide();
                                                     $diskIopsReadRate.hide();
                                                     $diskIopsWriteRate.hide();
+                                                    $diskIopsRatePerGb.hide();
 
                                                     $isCustomizedIops.css('display', 'inline-block');
 
@@ -214,12 +216,14 @@
                                                     $diskIopsReadRate.css('display', 'inline-block');
                                                     $diskIopsWriteRate.css('display', 'inline-block');
                                                     $diskIopsTotalRate.css('display', 'inline-block');
+                                                    $diskIopsRatePerGb.css('display', 'inline-block');
                                                 } else { // No Qos
                                                     $diskBytesReadRate.hide();
                                                     $diskBytesWriteRate.hide();
                                                     $diskIopsReadRate.hide();
                                                     $diskIopsWriteRate.hide();
                                                     $diskIopsTotalRate.hide();
+                                                    $diskIopsRatePerGb.hide();
                                                     $isCustomizedIops.hide();
                                                     $minIops.hide();
                                                     $maxIops.hide();
@@ -300,6 +304,12 @@
                                             required: false, //optional
                                             number: true
                                         }
+                                    },
+                                    diskIopsRatePerGb: {
+                                        label: 'label.disk.iops.rate.per.gb',
+                                        docID: 'helpComputeOfferingDiskIopsRatePerGb',
+                                        isBoolean: true,
+                                        isChecked: false
                                     },
                                     offerHA: {
                                         label: 'label.offer.ha',
@@ -578,7 +588,8 @@
                                     displaytext: args.data.description,
                                     storageType: args.data.storageType,
                                     provisioningType: args.data.provisioningType,
-                                    customized: (args.data.isCustomized == "on")
+                                    customized: (args.data.isCustomized == "on"),
+                                    iopsratepergb: (args.data.diskIopsRatePerGb == "on")
                                 };
 
                                 //custom fields (begin)
@@ -902,7 +913,10 @@
                                     diskIopsTotalRate: {
                                         label: 'label.disk.iops.total.rate'
                                     },
-
+                                    diskIopsRatePerGb: {
+                                        label: 'label.disk.iops.rate.per.gb',
+                                        converter: cloudStack.converters.toBooleanText
+                                    },
                                     offerha: {
                                         label: 'label.offer.ha',
                                         converter: cloudStack.converters.toBooleanText
@@ -1157,6 +1171,12 @@
                                             required: false, //optional
                                             number: true
                                         }
+                                    },
+                                    diskIopsRatePerGb: {
+                                        label: 'label.disk.iops.rate.per.gb',
+                                        docID: 'helpSystemOfferingDiskIopsTotalRate',
+                                        isBoolean: true,
+                                        isChecked: false
                                     },
                                     offerHA: {
                                         label: 'label.offer.ha',
@@ -1463,6 +1483,10 @@
                                     diskIopsTotalRate: {
                                         label: 'label.disk.iops.total.rate'
                                     },
+                                    diskIopsRatePerGb: {
+                                        label: 'label.disk.iops.rate.per.gb',
+                                        converter: cloudStack.converters.toBooleanText
+                                    },
                                     offerha: {
                                         label: 'label.offer.ha',
                                         converter: cloudStack.converters.toBooleanText
@@ -1684,6 +1708,7 @@
                                                 var $diskIopsReadRate = $form.find('.form-item[rel=diskIopsReadRate]');
                                                 var $diskIopsWriteRate = $form.find('.form-item[rel=diskIopsWriteRate]');
                                                 var $diskIopsTotalRate = $form.find('.form-item[rel=diskIopsTotalRate]');
+                                                var $diskIopsRatePerGb = $form.find('.form-item[rel=diskIopsRatePerGb]');
 
                                                 var qosId = $(this).val();
 
@@ -1692,6 +1717,8 @@
                                                     $diskBytesWriteRate.hide();
                                                     $diskIopsReadRate.hide();
                                                     $diskIopsWriteRate.hide();
+                                                    $diskIopsTotalRate.hide();
+                                                    $diskIopsRatePerGb.hide();
 
                                                     $isCustomizedIops.css('display', 'inline-block');
 
@@ -1716,11 +1743,14 @@
                                                     $diskIopsReadRate.css('display', 'inline-block');
                                                     $diskIopsWriteRate.css('display', 'inline-block');
                                                     $diskIopsTotalRate.css('display', 'inline-block');
+                                                    $diskIopsRatePerGb.css('display', 'inline-block');
                                                 } else { // No Qos
                                                     $diskBytesReadRate.hide();
                                                     $diskBytesWriteRate.hide();
                                                     $diskIopsReadRate.hide();
                                                     $diskIopsWriteRate.hide();
+                                                    $diskIopsTotalRate.hide();
+                                                    $diskIopsRatePerGb.hide();
                                                     $isCustomizedIops.hide();
                                                     $minIops.hide();
                                                     $maxIops.hide();
@@ -1801,6 +1831,11 @@
                                             required: false, //optional
                                             number: true
                                         }
+                                    },
+                                    diskIopsRatePerGb: {
+                                        label: 'label.disk.iops.rate.per.gb',
+                                        docID: 'helpDiskOfferingDiskIopsRatePerGb',
+                                        isBoolean: true
                                     },
                                     cacheMode: {
                                         label: 'label.cache.mode',
@@ -1906,7 +1941,8 @@
                                     storageType: args.data.storageType,
                                     cacheMode: args.data.cacheMode,
                                     provisioningType: args.data.provisioningType,
-                                    customized: (args.data.isCustomized == "on")
+                                    customized: (args.data.isCustomized == "on"),
+                                    iopsratepergb: (args.data.diskIopsRatePerGb == "on")
                                 };
 
                                 if (args.data.isCustomized != "on") {
@@ -2143,6 +2179,10 @@
                                             else
                                                 return "N/A";
                                         }
+                                    },
+                                    diskIopsRatePerGb: {
+                                        label: 'label.disk.iops.rate.per.gb',
+                                        converter: cloudStack.converters.toBooleanText
                                     },
                                     diskBytesReadRate: {
                                         label: 'label.disk.bytes.read.rate'
