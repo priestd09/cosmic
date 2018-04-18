@@ -57,7 +57,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "iops_total_rate")
     Long iopsTotalRate;
     @Column(name = "iops_rate_per_gb")
-    Boolean iopsRatePerGb;
+    Boolean iopsRatePerGb = false;
     @Column(name = "cache_mode")
     String cacheMode;
     @Column(name = "chain_info", length = 65535)

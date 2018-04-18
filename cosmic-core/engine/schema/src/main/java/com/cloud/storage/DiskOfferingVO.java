@@ -54,7 +54,7 @@ public class DiskOfferingVO implements DiskOffering {
     @Column(name = "iops_total_rate")
     Long iopsTotalRate;
     @Column(name = "iops_rate_per_gb")
-    Boolean iopsRatePerGb;
+    Boolean iopsRatePerGb = false;
     @Column(name = "provisioning_type")
     Storage.ProvisioningType provisioningType;
     @Column(name = "display_offering")

@@ -32,7 +32,7 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
     @Column(name = "iops_total_rate")
     Long iopsTotalRate;
     @Column(name = "iops_rate_per_gb")
-    Boolean iopsRatePerGb;
+    Boolean iopsRatePerGb = false;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
