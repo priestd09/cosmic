@@ -7,10 +7,6 @@
     <listener>
         <listener-class>com.cloud.spring.module.web.CloudStackContextLoaderListener</listener-class>
     </listener>
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:META-INF/cosmic/webApplicationContext.xml</param-value>
-    </context-param>
 
     <servlet>
         <servlet-name>cloudStartupServlet</servlet-name>
