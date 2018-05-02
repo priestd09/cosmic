@@ -73,7 +73,7 @@ public interface VolumeOrchestrationService {
 
     void destroyVolume(Volume volume);
 
-    DiskProfile allocateRawVolume(Type type, String name, DiskOffering offering, Long size, Long minIops, Long maxIops, VirtualMachine vm, VirtualMachineTemplate template,
+    DiskProfile allocateRawVolume(Type type, String name, DiskOffering offering, Long size, VirtualMachine vm, VirtualMachineTemplate template,
                                   Account owner, DiskControllerType diskControllerType);
 
     VolumeInfo createVolumeOnPrimaryStorage(VirtualMachine vm, VolumeInfo volume, HypervisorType rootDiskHyperType, StoragePool storagePool) throws NoTransitionException;
@@ -96,7 +96,7 @@ public interface VolumeOrchestrationService {
 
     boolean canVmRestartOnAnotherServer(long vmId);
 
-    DiskProfile allocateTemplatedVolume(Type type, String name, DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, VirtualMachineTemplate template,
+    DiskProfile allocateTemplatedVolume(Type type, String name, DiskOffering offering, Long rootDisksize, VirtualMachineTemplate template,
                                         VirtualMachine vm, Account owner, DiskControllerType diskControllerType);
 
     String getVmNameFromVolumeId(long volumeId);

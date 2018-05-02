@@ -49,7 +49,7 @@ public interface VolumeApiService {
     /**
      * Uploads the volume to secondary storage
      *
-     * @param UploadVolumeCmdByAdmin cmd
+     * @param cmd cmd
      * @return Volume object
      */
     Volume uploadVolume(UploadVolumeCmd cmd) throws ResourceAllocationException;

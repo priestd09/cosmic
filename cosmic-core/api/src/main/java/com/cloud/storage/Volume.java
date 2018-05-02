@@ -23,10 +23,6 @@ public interface Volume extends ControlledEntity, Identity, InternalIdentity, Ba
      */
     Long getSize();
 
-    Long getMinIops();
-
-    Long getMaxIops();
-
     String get_iScsiName();
 
     /**

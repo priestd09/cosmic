@@ -43,10 +43,6 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     Storage.ProvisioningType provisioningType;
     @Column(name = "size")
     long size;
-    @Column(name = "min_iops")
-    Long minIops;
-    @Column(name = "max_iops")
-    Long maxIops;
     @Column(name = "attached")
     @Temporal(value = TemporalType.TIMESTAMP)
     Date attached;
@@ -58,6 +54,8 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     Long iopsReadRate;
     @Column(name = "iops_write_rate")
     Long iopsWriteRate;
+    @Column(name = "iops_total_rate")
+    Long iopsTotalRate;
     @Column(name = "cache_mode")
     String cacheMode;
     @Column(name = "chain_info", length = 65535)
@@ -232,14 +230,6 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setSize(final long size) {
         this.size = size;
-    }
-
-    public void setMinIops(final Long minIops) {
-        this.minIops = minIops;
-    }
-
-    public void setMaxIops(final Long maxIops) {
-        this.maxIops = maxIops;
     }
 
     public void setAttached(final Date attached) {
@@ -556,14 +546,6 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         return size;
     }
 
-    public Long getMinIops() {
-        return minIops;
-    }
-
-    public Long getMaxIops() {
-        return maxIops;
-    }
-
     public Volume.State getState() {
         return state;
     }
@@ -869,5 +851,13 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public DiskControllerType getDiskController() {
         return diskController;
+    }
+    
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
     }
 }

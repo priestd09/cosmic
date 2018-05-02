@@ -99,18 +99,6 @@ public class CloudOrchestrator implements OrchestrationService {
         rootDiskOfferingInfo.setDiskOffering(computeOffering);
         rootDiskOfferingInfo.setSize(rootDiskSize);
 
-        if (computeOffering.isCustomizedIops() != null && computeOffering.isCustomizedIops()) {
-            final Map<String, String> userVmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
-
-            if (userVmDetails != null) {
-                final String minIops = userVmDetails.get("minIops");
-                final String maxIops = userVmDetails.get("maxIops");
-
-                rootDiskOfferingInfo.setMinIops(minIops != null && minIops.trim().length() > 0 ? Long.parseLong(minIops) : null);
-                rootDiskOfferingInfo.setMaxIops(maxIops != null && maxIops.trim().length() > 0 ? Long.parseLong(maxIops) : null);
-            }
-        }
-
         if (vm.getDiskOfferingId() != null) {
             final DiskOfferingVO diskOffering = _diskOfferingDao.findById(vm.getDiskOfferingId());
             if (diskOffering == null) {
@@ -130,18 +118,6 @@ public class CloudOrchestrator implements OrchestrationService {
             dataDiskOfferingInfo.setDiskOffering(diskOffering);
             dataDiskOfferingInfo.setSize(size);
             dataDiskOfferingInfo.setDiskControllerType(diskControllerType);
-
-            if (diskOffering.isCustomizedIops() != null && diskOffering.isCustomizedIops()) {
-                final Map<String, String> userVmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
-
-                if (userVmDetails != null) {
-                    final String minIops = userVmDetails.get("minIopsDo");
-                    final String maxIops = userVmDetails.get("maxIopsDo");
-
-                    dataDiskOfferingInfo.setMinIops(minIops != null && minIops.trim().length() > 0 ? Long.parseLong(minIops) : null);
-                    dataDiskOfferingInfo.setMaxIops(maxIops != null && maxIops.trim().length() > 0 ? Long.parseLong(maxIops) : null);
-                }
-            }
 
             dataDiskOfferings.add(dataDiskOfferingInfo);
         }
@@ -186,18 +162,6 @@ public class CloudOrchestrator implements OrchestrationService {
 
         rootDiskOfferingInfo.setDiskOffering(diskOffering);
         rootDiskOfferingInfo.setSize(size);
-
-        if (diskOffering.isCustomizedIops() != null && diskOffering.isCustomizedIops()) {
-            final Map<String, String> userVmDetails = _userVmDetailsDao.listDetailsKeyPairs(vm.getId());
-
-            if (userVmDetails != null) {
-                final String minIops = userVmDetails.get("minIopsDo");
-                final String maxIops = userVmDetails.get("maxIopsDo");
-
-                rootDiskOfferingInfo.setMinIops(minIops != null && minIops.trim().length() > 0 ? Long.parseLong(minIops) : null);
-                rootDiskOfferingInfo.setMaxIops(maxIops != null && maxIops.trim().length() > 0 ? Long.parseLong(maxIops) : null);
-            }
-        }
 
         final LinkedHashMap<Network, List<? extends NicProfile>> networkIpMap = new LinkedHashMap<>();
         for (final String uuid : networkNicMap.keySet()) {
