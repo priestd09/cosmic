@@ -127,6 +127,7 @@ VALUES ('Advanced', 'DEFAULT', 'management-server', 'account.cleanup.interval', 
   ('Advanced', 'DEFAULT', 'management-server', 'vmware.vcenter.session.timeout', '1200', 'VMware client timeout in seconds', '1200', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'management-server', 'vpc.max.networks', '8', NULL, '8', NULL, NULL, 0),
   ('Advanced', 'DEFAULT', 'ManagementServer', 'xen.heartbeat.timeout', '180', 'Timeout value to send to the xenheartbeat script for guarding the self fencing functionality', '120', NULL, NULL, 0),
+  ('Advanced', 'DEFAULT', 'ManagementServer', 'powerstate.interval', '30000', 'Interval in ms to get powerstates to make sure the VM\'s are still in the correct state', '30000', NULL, NULL, 1),
   ('Advanced', 'DEFAULT', 'AgentManager', 'xenserver.nics.max', '7', 'Maximum allowed nics for Vms created on XenServer', '7', NULL, NULL, 0);
 
 INSERT INTO `guest_os_category` (`id`, `name`, `uuid`)

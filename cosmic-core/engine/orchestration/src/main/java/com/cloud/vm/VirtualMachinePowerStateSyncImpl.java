@@ -1,7 +1,9 @@
 package com.cloud.vm;
 
+import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.HostVmStateReportEntry;
 import com.cloud.framework.config.ConfigKey;
+import com.cloud.framework.config.Configurable;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.utils.DateUtil;
@@ -17,10 +19,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VirtualMachinePowerStateSyncImpl implements VirtualMachinePowerStateSync {
+public class VirtualMachinePowerStateSyncImpl implements VirtualMachinePowerStateSync, Configurable {
     private static final Logger s_logger = LoggerFactory.getLogger(VirtualMachinePowerStateSyncImpl.class);
-    protected final ConfigKey<Long> PowerStateInterval = new ConfigKey<>("Advanced", Long.class, "powerstate.interval", "30000",
-            "Interval in ms to get powerstates to make sure the VM's are still in the correct state", false);
+    private static final ConfigKey<Long> PowerStateInterval = new ConfigKey<>("Advanced", Long.class, "powerstate.interval", "30000",
+            "Interval in ms to get powerstates to make sure the VM's are still in the correct state", true);
     @Inject
     MessageBus _messageBus;
     @Inject
@@ -171,6 +173,16 @@ public class VirtualMachinePowerStateSyncImpl implements VirtualMachinePowerStat
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Done with process of VM state report. host: " + hostId);
         }
+    }
+
+    @Override
+    public String getConfigComponentName() {
+        return VirtualMachinePowerStateSyncImpl.class.getSimpleName();
+    }
+
+    @Override
+    public ConfigKey<?>[] getConfigKeys() {
+        return new ConfigKey<?>[]{PowerStateInterval};
     }
 
     private VMInstanceVO findVM(final String vmName) {
