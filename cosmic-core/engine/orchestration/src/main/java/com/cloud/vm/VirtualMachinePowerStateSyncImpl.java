@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
 
 public class VirtualMachinePowerStateSyncImpl implements VirtualMachinePowerStateSync {
     private static final Logger s_logger = LoggerFactory.getLogger(VirtualMachinePowerStateSyncImpl.class);
-    protected final ConfigKey<Integer> PingInterval = new ConfigKey<>(Integer.class, "ping.interval", "Advanced", "60",
-            "Interval to send application level pings to make sure the connection is still working", false);
+    protected final ConfigKey<Long> PowerStateInterval = new ConfigKey<>("Advanced", Long.class, "powerstate.interval", "30000",
+            "Interval in ms to get powerstates to make sure the VM's are still in the correct state", false);
     @Inject
     MessageBus _messageBus;
     @Inject
@@ -119,7 +119,7 @@ public class VirtualMachinePowerStateSyncImpl implements VirtualMachinePowerStat
             }
 
             // 2 times of sync-update interval for graceful period
-            final long milliSecondsGracefullPeriod = PingInterval.value() * 2000L;
+            final long milliSecondsGracefullPeriod = PowerStateInterval.value();
 
             for (final VMInstanceVO instance : vmsThatAreMissingReport) {
 
