@@ -1,13 +1,13 @@
 package com.cloud.mom.rabbitmq;
 
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.framework.events.Event;
 import com.cloud.framework.events.EventBus;
-import com.cloud.framework.events.EventBusException;
 import com.cloud.framework.events.EventSubscriber;
 import com.cloud.framework.events.EventTopic;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.EventBusException;
 import com.cloud.legacymodel.utils.Ternary;
-import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.utils.component.ManagerBase;
 
 import javax.naming.ConfigurationException;
@@ -278,7 +278,7 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
         if (s_connection == null) {
             try {
                 return createConnection();
-            } catch (KeyManagementException | NoSuchAlgorithmException | IOException | TimeoutException e) {
+            } catch (final KeyManagementException | NoSuchAlgorithmException | IOException | TimeoutException e) {
                 s_logger.warn("Failed to create a connection to AMQP server due to " + e.getMessage());
                 throw e;
             }

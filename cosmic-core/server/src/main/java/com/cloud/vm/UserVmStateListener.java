@@ -4,7 +4,7 @@ import com.cloud.configuration.Config;
 import com.cloud.event.EventCategory;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.EventBus;
-import com.cloud.framework.events.EventBusException;
+import com.cloud.legacymodel.exceptions.EventBusException;
 import com.cloud.legacymodel.statemachine.StateListener;
 import com.cloud.legacymodel.statemachine.Transition;
 import com.cloud.legacymodel.vm.VirtualMachine;

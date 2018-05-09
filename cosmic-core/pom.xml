@@ -27,7 +27,6 @@
         <module>framework/cluster</module>
         <module>framework/config</module>
         <module>framework/db</module>
-        <module>framework/events</module>
         <module>framework/ipc</module>
         <module>framework/jobs</module>
         <module>framework/security</module>

@@ -31,6 +31,7 @@ import com.cloud.api.response.CreateCmdResponse;
 import com.cloud.api.response.ExceptionResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.LoginCmdResponse;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.config.ApiServiceConfiguration;
 import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
@@ -45,7 +46,6 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.framework.events.Event;
 import com.cloud.framework.events.EventBus;
-import com.cloud.framework.events.EventBusException;
 import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.framework.jobs.impl.AsyncJobVO;
@@ -56,6 +56,7 @@ import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.AccountLimitException;
 import com.cloud.legacymodel.exceptions.CloudAuthenticationException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.EventBusException;
 import com.cloud.legacymodel.exceptions.ExceptionProxyObject;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
@@ -67,7 +68,6 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
 import com.cloud.user.UserVO;
@@ -672,7 +672,7 @@ public class ApiServer extends ManagerBase implements HttpRequestHandler, ApiSer
     }
 
     @Override
-    public boolean verifyRequest(final Map<String, Object[]> requestParameters, final Long userId, String remoteAddress) throws ServerApiException {
+    public boolean verifyRequest(final Map<String, Object[]> requestParameters, final Long userId, final String remoteAddress) throws ServerApiException {
         try {
             String apiKey = null;
             final String secretKey;

@@ -1,4 +1,4 @@
-package com.cloud.framework.events;
+package com.cloud.legacymodel.exceptions;
 
 public class EventBusException extends Exception {
     public EventBusException(final String msg) {

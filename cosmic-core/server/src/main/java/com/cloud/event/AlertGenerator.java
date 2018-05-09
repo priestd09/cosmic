@@ -7,7 +7,7 @@ import com.cloud.dc.dao.HostPodDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.Event;
 import com.cloud.framework.events.EventBus;
-import com.cloud.framework.events.EventBusException;
+import com.cloud.legacymodel.exceptions.EventBusException;
 import com.cloud.model.Zone;
 import com.cloud.server.ManagementService;
 import com.cloud.utils.component.ComponentContext;

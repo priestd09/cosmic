@@ -1,5 +1,7 @@
 package com.cloud.framework.events;
 
+import com.cloud.legacymodel.exceptions.EventBusException;
+
 import java.util.UUID;
 
 /**
