@@ -18,6 +18,7 @@ import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Co
 
 import static java.util.UUID.randomUUID;
 
+import com.cloud.agent.resource.kvm.event.LifecycleListener;
 import com.cloud.agent.resource.kvm.ha.KvmHaMonitor;
 import com.cloud.agent.resource.kvm.storage.KvmPhysicalDisk;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePool;
@@ -716,7 +717,21 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         storageProcessor.configure(name, propertiesMap);
         this.storageHandler = new StorageSubsystemCommandHandlerBase(storageProcessor);
 
+        initLibvirtLifecycleListener();
+
         return true;
+    }
+
+    private void initLibvirtLifecycleListener() {
+        try {
+            final Connect conn = LibvirtConnection.getConnection();
+
+            final LifecycleListener lifecycleListener = new LifecycleListener();
+
+            conn.addLifecycleListener(lifecycleListener);
+        } catch (final LibvirtException e) {
+            throw new CloudRuntimeException(e.getMessage());
+        }
     }
 
     private void initScripts(final LibvirtComputingResourceProperties libvirtComputingResourceProperties) throws ConfigurationException {
