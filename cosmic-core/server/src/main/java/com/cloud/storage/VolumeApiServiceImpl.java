@@ -69,6 +69,7 @@ import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
@@ -90,6 +91,7 @@ import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
+import com.cloud.offering.DiskOfferingInfo;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
@@ -561,10 +563,20 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                     diskController = DiskControllerType.valueOf(cmd.getDiskController().toUpperCase());
                 }
 
+                DiskOfferingVO diskOfferingVO = _diskOfferingDao.findById(volume.getDiskOfferingId());
+                DiskOffering.DiskCacheMode diskCacheMode = diskOfferingVO.getCacheMode();
+                if (diskCacheMode == null) {
+                    diskCacheMode = DiskOffering.DiskCacheMode.NONE;
+                }
+
+                if (cmd.getDiskController() != null) {
+                    diskController = DiskControllerType.valueOf(cmd.getDiskController().toUpperCase());
+                }
+
                 // if VM Id is provided, attach the volume to the VM
                 if (cmd.getVirtualMachineId() != null) {
                     try {
-                        attachVolumeToVM(cmd.getVirtualMachineId(), volume.getId(), volume.getDeviceId(), diskController);
+                        attachVolumeToVM(cmd.getVirtualMachineId(), volume.getId(), volume.getDeviceId(), diskController, diskCacheMode);
                     } catch (final Exception ex) {
                         final StringBuilder message = new StringBuilder("Volume: ");
                         message.append(volume.getUuid());
@@ -611,7 +623,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return this._volsDao.findById(createdVolume.getId());
     }
 
-    public Volume attachVolumeToVM(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController) {
+    public Volume attachVolumeToVM(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController,
+                                   final DiskOffering.DiskCacheMode diskCacheMode) {
         final Account caller = CallContext.current().getCallingAccount();
 
         // Check that the volume ID is valid
@@ -914,7 +927,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return newVol;
     }
 
-    public Outcome<Volume> attachVolumeToVmThroughJobQueue(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController) {
+    public Outcome<Volume> attachVolumeToVmThroughJobQueue(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController,
+                                                           final DiskOffering.DiskCacheMode diskCacheMode) {
 
         final CallContext context = CallContext.current();
         final User callingUser = context.getCallingUser();
@@ -936,7 +950,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         // save work context info (there are some duplications)
         final VmWorkAttachVolume workInfo = new VmWorkAttachVolume(callingUser.getId(), callingAccount.getId(), vm.getId(),
-                VolumeApiServiceImpl.VM_WORK_JOB_HANDLER, volumeId, deviceId, diskController);
+                VolumeApiServiceImpl.VM_WORK_JOB_HANDLER, volumeId, deviceId, diskController, diskCacheMode);
         workJob.setCmdInfo(VmWorkSerializer.serialize(workInfo));
 
         this._jobMgr.submitAsyncJob(workJob, VmWorkConstants.VM_WORK_QUEUE, vm.getId());

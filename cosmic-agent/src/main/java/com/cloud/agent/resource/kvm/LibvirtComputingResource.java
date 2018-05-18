@@ -1695,7 +1695,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 } else if (pool.getType() == StoragePoolType.CLVM || physicalDisk.getFormat() == PhysicalDiskFormat.RAW) {
                     disk.defBlockBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController());
                 } else {
-                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), LibvirtDiskDef.DiskFmtType.QCOW2);
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), LibvirtDiskDef.DiskFmtType.QCOW2, LibvirtDiskDef.DiskCacheMode.NONE);
                 }
             }
 

@@ -1150,7 +1150,7 @@ public class KvmStorageProcessor implements StorageProcessor {
                             attachingPool.getSourcePort(), null,
                             null, devId, diskControllerType, LibvirtDiskDef.DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
                 } else if (attachingDisk.getFormat() == PhysicalDiskFormat.QCOW2) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, LibvirtDiskDef.DiskFmtType.QCOW2);
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, LibvirtDiskDef.DiskFmtType.QCOW2, LibvirtDiskDef.DiskCacheMode.NONE);
                 } else if (attachingDisk.getFormat() == PhysicalDiskFormat.RAW) {
                     diskdef.defBlockBasedDisk(attachingDisk.getPath(), devId, diskControllerType);
                 }
