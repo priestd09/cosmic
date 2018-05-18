@@ -66,8 +66,7 @@ public class LibvirtVMDefTest extends TestCase {
         final DiskControllerType bus = DiskControllerType.SCSI;
         final LibvirtDiskDef.DiskFmtType type = LibvirtDiskDef.DiskFmtType.QCOW2;
         final LibvirtDiskDef.DiskCacheMode cacheMode = LibvirtDiskDef.DiskCacheMode.WRITEBACK;
-        disk.defFileBasedDisk(filePath, diskLabel, bus, type);
-        disk.setCacheMode(cacheMode);
+        disk.defFileBasedDisk(filePath, diskLabel, bus, type, cacheMode);
         disk.setDeviceId(deviceId);
 
         assertEquals(filePath, disk.getDiskPath());

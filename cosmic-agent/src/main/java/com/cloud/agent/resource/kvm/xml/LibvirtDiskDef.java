@@ -35,10 +35,10 @@ public class LibvirtDiskDef {
         this.discard = discard;
     }
 
-    public void defFileBasedDisk(final String filePath, final String diskLabel, final DiskControllerType bus, final DiskFmtType diskFmtType) {
+    public void defFileBasedDisk(final String filePath, final String diskLabel, final DiskControllerType bus, final DiskFmtType diskFmtType, final DiskCacheMode diskCacheMode) {
         this.diskType = DiskType.FILE;
         this.deviceType = DeviceType.DISK;
-        this.diskCacheMode = DiskCacheMode.NONE;
+        this.diskCacheMode = diskCacheMode;
         this.sourcePath = filePath;
         this.diskLabel = diskLabel;
         this.diskFmtType = diskFmtType;

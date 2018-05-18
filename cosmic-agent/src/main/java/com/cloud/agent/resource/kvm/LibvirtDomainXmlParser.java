@@ -93,7 +93,11 @@ public class LibvirtDomainXmlParser {
                             if (diskFmtType != null) {
                                 fmt = LibvirtDiskDef.DiskFmtType.valueOf(diskFmtType.toUpperCase());
                             }
-                            def.defFileBasedDisk(diskFile, diskLabel, DiskControllerType.valueOf(bus.toUpperCase()), fmt);
+                            LibvirtDiskDef.DiskCacheMode diskCache = LibvirtDiskDef.DiskCacheMode.NONE;
+                            if (diskCacheMode != null) {
+                                diskCache = LibvirtDiskDef.DiskCacheMode.valueOf(diskCacheMode.toUpperCase());
+                            }
+                            def.defFileBasedDisk(diskFile, diskLabel, DiskControllerType.valueOf(bus.toUpperCase()), fmt, diskCache);
                         } else if (device.equalsIgnoreCase("cdrom")) {
                             def.defIsoDisk(diskFile);
                         }
